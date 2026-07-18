@@ -7,6 +7,7 @@ import { AuthCard } from "@/components/auth/auth-card";
 import { OtpInput } from "@/components/auth/otp-input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { authErrorMessage } from "@/lib/auth-error";
 import { createClient } from "@/lib/supabase/client";
 
 function VerifyEmailForm() {
@@ -31,7 +32,7 @@ function VerifyEmailForm() {
     setLoading(false);
 
     if (error) {
-      setError(error.message);
+      setError(authErrorMessage(error));
       return;
     }
 
@@ -43,7 +44,7 @@ function VerifyEmailForm() {
     setResent(false);
     const { error } = await supabase.auth.resend({ type: "signup", email });
     if (error) {
-      setError(error.message);
+      setError(authErrorMessage(error));
       return;
     }
     setResent(true);

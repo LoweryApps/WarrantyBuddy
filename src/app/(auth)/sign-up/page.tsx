@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AuthInput } from "@/components/auth/auth-input";
 import { Label } from "@/components/ui/label";
+import { authErrorMessage } from "@/lib/auth-error";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SignUpPage() {
@@ -41,7 +42,7 @@ export default function SignUpPage() {
     setLoading(false);
 
     if (error) {
-      setError(error.message);
+      setError(authErrorMessage(error));
       return;
     }
 

@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { AuthInput } from "@/components/auth/auth-input";
 import { Label } from "@/components/ui/label";
+import { authErrorMessage } from "@/lib/auth-error";
 import { createClient } from "@/lib/supabase/client";
 
 function LoginForm() {
@@ -33,7 +34,7 @@ function LoginForm() {
     setLoading(false);
 
     if (error) {
-      setError(error.message);
+      setError(authErrorMessage(error));
       return;
     }
 
