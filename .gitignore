@@ -36,6 +36,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Claude Code local settings — permission-approval cache can retain
+# fragments of past command invocations verbatim, including secrets typed
+# into one-off curl/test commands. Never committed.
+.claude/settings.local.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
