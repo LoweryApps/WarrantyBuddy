@@ -7,9 +7,11 @@ import { AuthCard } from "@/components/auth/auth-card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { AuthInput } from "@/components/auth/auth-input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { authErrorMessage } from "@/lib/auth-error";
 import { createClient } from "@/lib/supabase/client";
+import { forgetSessionOnBrowserClose } from "@/lib/supabase/session-persistence";
 
 function LoginForm() {
   const router = useRouter();
@@ -18,6 +20,7 @@ function LoginForm() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(
     searchParams.get("error") === "invalid-link"
@@ -36,6 +39,10 @@ function LoginForm() {
     if (error) {
       setError(authErrorMessage(error));
       return;
+    }
+
+    if (!rememberMe) {
+      forgetSessionOnBrowserClose();
     }
 
     router.push("/dashboard");
@@ -85,7 +92,18 @@ function LoginForm() {
           />
         </div>
 
-        <div className="!mt-2 text-right">
+        <div className="!mt-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="rememberMe"
+              checked={rememberMe}
+              onCheckedChange={(checked) => setRememberMe(checked === true)}
+              className="border-border data-checked:border-teal data-checked:bg-teal data-checked:text-navy"
+            />
+            <Label htmlFor="rememberMe" className="text-[11px] font-normal text-ink">
+              Remember me
+            </Label>
+          </div>
           <Link href="/forgot-password" className="text-[11px] font-medium text-teal">
             Forgot password?
           </Link>

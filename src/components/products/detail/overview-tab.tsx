@@ -2,7 +2,9 @@ import {
   Calendar,
   DollarSign,
   ExternalLink,
+  Hash,
   LayoutGrid,
+  MapPin,
   ScanLine,
   Store,
   Tag,
@@ -40,7 +42,7 @@ export function OverviewTab({
     <div>
       <div className="mb-2 text-[10px] tracking-wide text-ink uppercase">Product details</div>
       <div className="mb-4">
-        <FieldRow icon={Tag} label="Brand">
+        <FieldRow icon={Tag} label={product.category === "Vehicle" ? "Make" : "Brand"}>
           {product.brand || "—"}
         </FieldRow>
         <FieldRow icon={ScanLine} label="Model number">
@@ -63,8 +65,31 @@ export function OverviewTab({
             "—"
           )}
         </FieldRow>
+        {product.category === "Vehicle" ? (
+          <FieldRow icon={ScanLine} label="VIN">
+            {product.vin ? (
+              <>
+                <span className="font-mono text-[11px]">{product.vin}</span>
+                <CopyButton value={product.vin} label="Copy VIN" />
+              </>
+            ) : (
+              "—"
+            )}
+          </FieldRow>
+        ) : null}
+        {product.category === "Vehicle" ? (
+          <FieldRow icon={Calendar} label="Model year">
+            {product.model_year ?? "—"}
+          </FieldRow>
+        ) : null}
         <FieldRow icon={LayoutGrid} label="Category">
           {product.category}
+        </FieldRow>
+        <FieldRow icon={MapPin} label="Room / location">
+          {product.room_location || "—"}
+        </FieldRow>
+        <FieldRow icon={Hash} label="Quantity">
+          {product.quantity}
         </FieldRow>
       </div>
 

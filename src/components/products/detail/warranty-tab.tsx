@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Phone } from "lucide-react";
+import { Phone, Sparkles } from "lucide-react";
 import { KnownIssueBanner, type KnownIssueRecord } from "@/components/product-intelligence/known-issue-banner";
-import { WarrantyForm } from "@/components/products/detail/warranty-form";
+import { UpgradeDialog } from "@/components/paywall/upgrade-dialog";
+import { WarrantyForm, type WarrantySuggestion } from "@/components/products/detail/warranty-form";
 import type { WarrantyRecord } from "@/components/products/detail/types";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
-import { daysUntil, warrantyStatus } from "@/lib/warranty";
+import { addMonthsToDateOnly, daysUntil, warrantyStatus } from "@/lib/warranty";
+import type { WarrantyType } from "@/lib/supabase/types";
 
 const RING_COLOR = {
   active: "border-teal",
@@ -28,7 +30,9 @@ export function WarrantyTab({
   productId,
   brand,
   modelNumber,
+  purchaseDate,
   warranty,
+  premium,
   onFileClaim,
   onAskBuddy,
   onChanged,
@@ -36,13 +40,85 @@ export function WarrantyTab({
   productId: string;
   brand: string | null;
   modelNumber: string | null;
+  purchaseDate: string | null;
   warranty: WarrantyRecord | null;
+  premium: boolean;
   onFileClaim: () => void;
   onAskBuddy: () => void;
   onChanged: () => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [knownIssue, setKnownIssue] = useState<KnownIssueRecord | null>(null);
+  const [suggestion, setSuggestion] = useState<WarrantySuggestion | null>(null);
+  const [searching, setSearching] = useState(false);
+  const [searchNotice, setSearchNotice] = useState<string | null>(null);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+
+  async function handleSearch() {
+    if (!premium) {
+      setUpgradeOpen(true);
+      return;
+    }
+
+    setSearching(true);
+    setSearchNotice(null);
+
+    try {
+      const res = await fetch("/api/warranty-search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId }),
+      });
+      const body = await res.json();
+
+      if (res.status === 402) {
+        setUpgradeOpen(true);
+        return;
+      }
+      if (!res.ok) {
+        setSearchNotice(body.message ?? "Buddy couldn't search for warranty terms right now.");
+        return;
+      }
+
+      const data = body.data as {
+        found: boolean;
+        reason?: string;
+        warranty_type?: string;
+        duration_months?: number | null;
+        coverage_description?: string | null;
+        exclusions?: string | null;
+        claim_contact?: string | null;
+        source_note?: string | null;
+      };
+
+      if (!data.found) {
+        setSearchNotice(
+          data.reason ?? "Buddy couldn't find reliable warranty terms for this product online.",
+        );
+        return;
+      }
+
+      const warrantyType: WarrantyType =
+        data.warranty_type === "Extended" || data.warranty_type === "Retailer"
+          ? data.warranty_type
+          : "Manufacturer";
+
+      setSuggestion({
+        warrantyType,
+        startDate: purchaseDate ?? "",
+        endDate:
+          purchaseDate && data.duration_months ? addMonthsToDateOnly(purchaseDate, data.duration_months) : "",
+        coverageDescription: data.coverage_description ?? "",
+        exclusions: data.exclusions ?? "",
+        claimContact: data.claim_contact ?? "",
+        sourceNote: data.source_note ?? "",
+      });
+    } catch {
+      setSearchNotice("Buddy couldn't search for warranty terms right now — try again.");
+    } finally {
+      setSearching(false);
+    }
+  }
 
   const status = warranty ? warrantyStatus(warranty.end_date) : "none";
 
@@ -80,14 +156,51 @@ export function WarrantyTab({
         <div className="mb-2.5 text-[10px] tracking-wide text-ink uppercase">
           {warranty ? "Edit warranty" : "No warranty on file yet"}
         </div>
+
+        {!warranty && !suggestion ? (
+          <button
+            type="button"
+            disabled={searching}
+            onClick={handleSearch}
+            className="mb-3.5 flex w-full items-center justify-between rounded-xl border border-teal/30 bg-teal/5 p-3.5 text-left disabled:opacity-70"
+          >
+            <div>
+              <div className="flex items-center gap-1.5 text-xs font-medium text-navy">
+                <Sparkles className="h-3.5 w-3.5 text-teal" />
+                {searching ? "Buddy is searching…" : "Search for warranty terms"}
+              </div>
+              <div className="mt-0.5 text-[11px] text-ink">
+                Let Buddy look up this manufacturer&apos;s standard warranty online
+              </div>
+            </div>
+          </button>
+        ) : null}
+
+        {!warranty && searchNotice ? (
+          <div className="mb-3.5 rounded-[10px] bg-amber/10 p-3 text-xs leading-relaxed text-amber">
+            {searchNotice}
+          </div>
+        ) : null}
+
         <WarrantyForm
+          key={warranty ? "editing" : suggestion ? "suggested" : "empty"}
           productId={productId}
           existing={warranty}
+          suggestion={!warranty ? suggestion : null}
           onSaved={() => {
             setEditing(false);
+            setSuggestion(null);
             onChanged();
           }}
-          onCancel={warranty ? () => setEditing(false) : undefined}
+          onCancel={
+            warranty ? () => setEditing(false) : suggestion ? () => setSuggestion(null) : undefined
+          }
+        />
+
+        <UpgradeDialog
+          open={upgradeOpen}
+          onOpenChange={setUpgradeOpen}
+          reason="Warranty Search is a Premium feature."
         />
       </div>
     );

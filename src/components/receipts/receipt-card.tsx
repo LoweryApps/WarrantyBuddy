@@ -175,7 +175,7 @@ export function ReceiptCard({
         exclusions: exclusions.trim() || null,
         claim_contact: claimContact.trim() || null,
         document_url: draft.raw_email_url,
-        ai_extracted: true,
+        warranty_source: draft.raw_email_url ? "Uploaded" : "User-Entered",
       });
     }
 

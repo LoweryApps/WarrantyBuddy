@@ -7,6 +7,7 @@ import { ChevronLeft, TriangleAlert } from "lucide-react";
 import { AskBuddyPanel } from "@/components/ask-buddy/ask-buddy-panel";
 import { CategoryIcon } from "@/components/dashboard/category-icon";
 import { WarrantyBadge } from "@/components/dashboard/warranty-badge";
+import { ClaimReadiness } from "@/components/products/detail/claim-readiness";
 import { DocumentsTab } from "@/components/products/detail/documents-tab";
 import { EditProductDialog } from "@/components/products/detail/edit-product-dialog";
 import { OverviewTab } from "@/components/products/detail/overview-tab";
@@ -26,11 +27,13 @@ export function ProductDetailView({
   warranty,
   documents,
   recallAlerts,
+  premium,
 }: {
   product: ProductRecord;
   warranty: WarrantyRecord | null;
   documents: DocumentRecord[];
   recallAlerts: RecallAlertRecord[];
+  premium: boolean;
 }) {
   const router = useRouter();
   const [tab, setTab] = useState("overview");
@@ -90,18 +93,26 @@ export function ProductDetailView({
           </button>
         ) : null}
 
-        <div className="mb-4 flex items-center gap-3">
-          <CategoryIcon category={product.category} />
-          <div>
-            <div className="text-base font-medium text-foreground">{product.name}</div>
-            <div className="text-xs text-ink">
-              {[product.brand, product.model_number].filter(Boolean).join(" · ")}
-            </div>
-            <div className="mt-1">
-              <WarrantyBadge status={status} />
+        <ClaimReadiness
+          productId={product.id}
+          hasReceipt={documents.some((d) => d.document_type === "Receipt")}
+          purchaseDate={product.purchase_date}
+          serialNumber={product.serial_number}
+          onChanged={refresh}
+        >
+          <div className="flex items-center gap-3">
+            <CategoryIcon category={product.category} />
+            <div>
+              <div className="text-base font-medium text-foreground">{product.name}</div>
+              <div className="text-xs text-ink">
+                {[product.brand, product.model_number].filter(Boolean).join(" · ")}
+              </div>
+              <div className="mt-1">
+                <WarrantyBadge status={status} />
+              </div>
             </div>
           </div>
-        </div>
+        </ClaimReadiness>
 
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="mb-4 w-full justify-start gap-1 border-b border-border bg-transparent p-0">
@@ -148,7 +159,9 @@ export function ProductDetailView({
               productId={product.id}
               brand={product.brand}
               modelNumber={product.model_number}
+              purchaseDate={product.purchase_date}
               warranty={warranty}
+              premium={premium}
               onFileClaim={handleFileClaim}
               onAskBuddy={() => setBuddyOpen(true)}
               onChanged={refresh}

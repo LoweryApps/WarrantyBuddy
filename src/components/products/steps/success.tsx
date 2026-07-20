@@ -6,6 +6,7 @@ import {
   ArrowRight,
   ChevronRight,
   CircleCheck,
+  ExternalLink,
   FileCheck,
   Plus,
   TriangleAlert,
@@ -64,6 +65,23 @@ export function Success({
 
       <div className="mb-2.5 text-[10px] tracking-wide text-ink uppercase">Next steps</div>
       <div className="overflow-hidden rounded-xl border border-border bg-white">
+        {product.brand ? (
+          <a
+            href={`https://www.google.com/search?q=${encodeURIComponent(`${product.brand} product registration`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex w-full items-center gap-3 border-b border-border p-3.5 text-left"
+          >
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-navy/10 text-navy">
+              <ExternalLink className="h-4 w-4" />
+            </div>
+            <div className="flex-1">
+              <div className="text-xs font-medium text-navy">Register with {product.brand}</div>
+              <div className="text-[11px] text-ink">Optional — find the official registration page</div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-ink" />
+          </a>
+        ) : null}
         <button
           type="button"
           onClick={() => setDialogOpen(true)}

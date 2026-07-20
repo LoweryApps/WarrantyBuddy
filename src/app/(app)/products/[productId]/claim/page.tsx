@@ -26,7 +26,7 @@ export default async function ClaimAssistPage({
     user ? loadPremiumStatus(supabase, user.id) : Promise.resolve(false),
     supabase
       .from("products")
-      .select("id, name, brand, model_number, serial_number, category, purchase_date, purchase_price, retailer")
+      .select("id, name, brand, model_number, serial_number, category, vin, purchase_date, purchase_price, retailer")
       .eq("id", productId)
       .single()
       .returns<ClaimProduct>(),

@@ -7,6 +7,7 @@ export interface ClaimProduct {
   model_number: string | null;
   serial_number: string | null;
   category: ProductCategory;
+  vin: string | null;
   purchase_date: string | null;
   purchase_price: number | null;
   retailer: string | null;

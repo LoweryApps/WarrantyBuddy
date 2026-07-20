@@ -8,6 +8,7 @@ import {
   type ProductContext,
   type VaultProductSummary,
 } from "@/lib/ask-buddy";
+import { guessMediaType } from "@/lib/document-media-type";
 import { isPremium } from "@/lib/entitlements";
 import { PID_SOURCE_LABEL } from "@/lib/product-intelligence";
 import { downloadProductFile } from "@/lib/supabase/storage";
@@ -18,23 +19,6 @@ import { warrantyStatus } from "@/lib/warranty";
 export const runtime = "nodejs";
 
 const HISTORY_LIMIT = 20;
-
-function guessMediaType(fileName: string): "application/pdf" | "image/jpeg" | "image/png" | "image/webp" | null {
-  const ext = fileName.toLowerCase().split(".").pop();
-  switch (ext) {
-    case "pdf":
-      return "application/pdf";
-    case "jpg":
-    case "jpeg":
-      return "image/jpeg";
-    case "png":
-      return "image/png";
-    case "webp":
-      return "image/webp";
-    default:
-      return null;
-  }
-}
 
 interface VaultProductRow {
   id: string;

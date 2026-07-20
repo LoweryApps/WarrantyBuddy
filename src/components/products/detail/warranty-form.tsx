@@ -46,6 +46,16 @@ interface WarrantyExtraction {
   uncertain: string[];
 }
 
+export interface WarrantySuggestion {
+  warrantyType: WarrantyType;
+  startDate: string;
+  endDate: string;
+  coverageDescription: string;
+  exclusions: string;
+  claimContact: string;
+  sourceNote: string;
+}
+
 function FieldLabel({
   children,
   field,
@@ -76,22 +86,28 @@ function FieldLabel({
 export function WarrantyForm({
   productId,
   existing,
+  suggestion,
   onSaved,
   onCancel,
 }: {
   productId: string;
   existing: WarrantyRecord | null;
+  suggestion?: WarrantySuggestion | null;
   onSaved: () => void;
   onCancel?: () => void;
 }) {
   const [warrantyType, setWarrantyType] = useState<WarrantyType>(
-    existing?.warranty_type ?? "Manufacturer",
+    existing?.warranty_type ?? suggestion?.warrantyType ?? "Manufacturer",
   );
-  const [startDate, setStartDate] = useState(existing?.start_date ?? "");
-  const [endDate, setEndDate] = useState(existing?.end_date ?? "");
-  const [coverage, setCoverage] = useState(existing?.coverage_description ?? "");
-  const [exclusions, setExclusions] = useState(existing?.exclusions ?? "");
-  const [claimContact, setClaimContact] = useState(existing?.claim_contact ?? "");
+  const [startDate, setStartDate] = useState(existing?.start_date ?? suggestion?.startDate ?? "");
+  const [endDate, setEndDate] = useState(existing?.end_date ?? suggestion?.endDate ?? "");
+  const [coverage, setCoverage] = useState(
+    existing?.coverage_description ?? suggestion?.coverageDescription ?? "",
+  );
+  const [exclusions, setExclusions] = useState(existing?.exclusions ?? suggestion?.exclusions ?? "");
+  const [claimContact, setClaimContact] = useState(
+    existing?.claim_contact ?? suggestion?.claimContact ?? "",
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -102,8 +118,24 @@ export function WarrantyForm({
     null,
   );
   const [uncertainFields, setUncertainFields] = useState<Set<WarrantyField>>(new Set());
-  const [aiFilledFields, setAiFilledFields] = useState<Set<WarrantyField>>(new Set());
-  const [usedAi, setUsedAi] = useState(existing?.ai_extracted ?? false);
+  const [aiFilledFields, setAiFilledFields] = useState<Set<WarrantyField>>(
+    new Set(
+      suggestion
+        ? WARRANTY_FIELDS.filter((field) =>
+            field === "start_date"
+              ? suggestion.startDate
+              : field === "end_date"
+                ? suggestion.endDate
+                : field === "coverage_description"
+                  ? suggestion.coverageDescription
+                  : field === "exclusions"
+                    ? suggestion.exclusions
+                    : suggestion.claimContact,
+          )
+        : [],
+    ),
+  );
+  const [usedAi, setUsedAi] = useState(false);
 
   async function handleFile(file: File) {
     setUploading(true);
@@ -228,8 +260,8 @@ export function WarrantyForm({
       exclusions: exclusions.trim() || null,
       claim_contact: claimContact.trim() || null,
       document_url: documentPath,
-      ai_extracted: usedAi,
-    };
+      warranty_source: documentPath ? "Uploaded" : suggestion ? "AI-Suggested" : "User-Entered",
+    } as const;
 
     const { error: dbError } = existing
       ? await supabase.from("warranties").update(payload).eq("id", existing.id)
@@ -254,6 +286,18 @@ export function WarrantyForm({
         <Alert className="border-red/30 bg-red/5 text-red">
           <AlertDescription className="text-red">{error}</AlertDescription>
         </Alert>
+      ) : null}
+
+      {suggestion ? (
+        <div className="flex items-start gap-1.5 rounded-[10px] bg-teal/10 p-3 text-xs leading-snug text-teal">
+          <Sparkles className="mt-0.5 h-4 w-4 shrink-0" />
+          <div>
+            <div className="font-medium">Buddy found this online — please confirm before saving</div>
+            {suggestion.sourceNote ? (
+              <div className="mt-0.5 text-teal/80">{suggestion.sourceNote}</div>
+            ) : null}
+          </div>
+        </div>
       ) : null}
 
       <div className="space-y-1.5">

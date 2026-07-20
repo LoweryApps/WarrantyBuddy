@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AlertTriangle, Check, Sparkles } from "lucide-react";
 import { AuthInput } from "@/components/auth/auth-input";
 import { CategorySelect } from "@/components/products/category-select";
+import { RoomLocationField } from "@/components/products/room-location-select";
 import type { InputMethod, ProductDraft, SavedProduct } from "@/components/products/types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -92,6 +93,11 @@ export function Review({
         model_number: form.modelNumber.trim() || null,
         serial_number: form.serialNumber.trim() || null,
         category: form.category || "Other",
+        vin: form.category === "Vehicle" ? form.vin.trim() || null : null,
+        model_year:
+          form.category === "Vehicle" && form.modelYear ? Number(form.modelYear) : null,
+        room_location: form.roomLocation.trim() || null,
+        quantity: form.quantity ? Number(form.quantity) : 1,
         purchase_date: form.purchaseDate || null,
         purchase_price: form.purchasePrice ? Number(form.purchasePrice) : null,
         retailer: form.retailer.trim() || null,
@@ -171,7 +177,7 @@ export function Review({
       }
     }
 
-    onSaved({ id: product.id, name: product.name, recallMatch, knownIssue });
+    onSaved({ id: product.id, name: product.name, brand: form.brand.trim() || null, recallMatch, knownIssue });
   }
 
   return (
@@ -207,7 +213,7 @@ export function Review({
       <div className="mb-3.5 grid grid-cols-2 gap-2.5">
         <div className="space-y-1.5">
           <FieldLabel field="brand" uncertain={uncertainFields} aiFilled={aiFilledFields}>
-            Brand <span className="text-red">*</span>
+            {form.category === "Vehicle" ? "Make" : "Brand"} <span className="text-red">*</span>
           </FieldLabel>
           <AuthInput
             value={form.brand}
@@ -243,6 +249,55 @@ export function Review({
           Category <span className="text-red">*</span>
         </FieldLabel>
         <CategorySelect value={form.category} onChange={(v) => set("category", v)} />
+      </div>
+
+      {form.category === "Vehicle" ? (
+        <div className="mb-3.5 grid grid-cols-2 gap-2.5">
+          <div className="space-y-1.5">
+            <FieldLabel field="vin" uncertain={uncertainFields} aiFilled={aiFilledFields}>
+              VIN
+            </FieldLabel>
+            <AuthInput
+              value={form.vin}
+              onChange={(e) => set("vin", e.target.value)}
+              className={inputClass("vin")}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <FieldLabel field="modelYear" uncertain={uncertainFields} aiFilled={aiFilledFields}>
+              Model year
+            </FieldLabel>
+            <AuthInput
+              type="number"
+              inputMode="numeric"
+              value={form.modelYear}
+              onChange={(e) => set("modelYear", e.target.value)}
+              className={inputClass("modelYear")}
+            />
+          </div>
+        </div>
+      ) : null}
+
+      <div className="mb-3.5 grid grid-cols-2 gap-2.5">
+        <div className="space-y-1.5">
+          <FieldLabel field="roomLocation" uncertain={uncertainFields} aiFilled={aiFilledFields}>
+            Room / location
+          </FieldLabel>
+          <RoomLocationField value={form.roomLocation} onChange={(v) => set("roomLocation", v)} />
+        </div>
+        <div className="space-y-1.5">
+          <FieldLabel field="quantity" uncertain={uncertainFields} aiFilled={aiFilledFields}>
+            Quantity
+          </FieldLabel>
+          <AuthInput
+            type="number"
+            min={1}
+            inputMode="numeric"
+            value={form.quantity}
+            onChange={(e) => set("quantity", e.target.value)}
+            className={inputClass("quantity")}
+          />
+        </div>
       </div>
 
       <div className="mb-2.5 mt-5 text-[10px] tracking-wide text-ink uppercase">Purchase info</div>

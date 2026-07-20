@@ -74,6 +74,14 @@ export function Step3Contact({
               <span className="font-mono text-foreground">{product.serial_number}</span>
             </div>
           ) : null}
+          {product.category === "Vehicle" && product.vin ? (
+            <div className="flex items-center gap-2 text-[11px] text-ink">
+              <Check className="h-3 w-3 shrink-0 text-teal" />
+              VIN
+              <CopyButton value={product.vin} label="Copy VIN" />
+              <span className="font-mono text-foreground">{product.vin}</span>
+            </div>
+          ) : null}
           {product.purchase_date ? (
             <div className="flex items-center gap-2 text-[11px] text-ink">
               <Check className="h-3 w-3 shrink-0 text-teal" />

@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
-import { Database, Download } from "lucide-react";
+import { ChevronRight, Database, Download, FileText } from "lucide-react";
 import { UpgradeDialog } from "@/components/paywall/upgrade-dialog";
 import { DeleteAccountSection } from "@/components/settings/delete-account-section";
 import { SettingsSection } from "@/components/settings/section";
@@ -27,11 +28,6 @@ export function DataExportSection({ premium }: { premium: boolean }) {
   const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   async function handleExport() {
-    if (!premium) {
-      setUpgradeOpen(true);
-      return;
-    }
-
     setExporting(true);
     setError(null);
 
@@ -101,15 +97,41 @@ export function DataExportSection({ premium }: { premium: boolean }) {
           className="h-10 w-full rounded-lg border-border bg-cloud text-foreground hover:bg-cloud/70"
         >
           <Download className="h-4 w-4" />
-          {exporting ? "Preparing export…" : premium ? "Export all data as CSV" : "Export all data as CSV (Premium)"}
+          {exporting ? "Preparing export…" : "Export all data as CSV"}
         </Button>
+
+        {premium ? (
+          <Link
+            href="/insurance-export"
+            className="flex h-10 w-full items-center justify-between rounded-lg border border-border bg-cloud px-3 text-xs text-foreground hover:bg-cloud/70"
+          >
+            <span className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Generate insurance inventory
+            </span>
+            <ChevronRight className="h-4 w-4 text-ink" />
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setUpgradeOpen(true)}
+            className="flex h-10 w-full items-center justify-between rounded-lg border border-border bg-cloud px-3 text-xs text-foreground hover:bg-cloud/70"
+          >
+            <span className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Generate insurance inventory (Premium)
+            </span>
+            <ChevronRight className="h-4 w-4 text-ink" />
+          </button>
+        )}
+
         <DeleteAccountSection />
       </div>
 
       <UpgradeDialog
         open={upgradeOpen}
         onOpenChange={setUpgradeOpen}
-        reason="CSV data export is a Premium feature."
+        reason="The insurance-ready inventory export is a Premium feature."
       />
     </SettingsSection>
   );

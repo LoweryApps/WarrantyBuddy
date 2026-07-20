@@ -2,6 +2,7 @@ import type {
   DocumentType,
   ProductCategory,
   RecallSource,
+  WarrantySource,
   WarrantyType,
 } from "@/lib/supabase/types";
 
@@ -12,6 +13,10 @@ export interface ProductRecord {
   model_number: string | null;
   serial_number: string | null;
   category: ProductCategory;
+  vin: string | null;
+  model_year: number | null;
+  room_location: string | null;
+  quantity: number;
   purchase_date: string | null;
   purchase_price: number | null;
   retailer: string | null;
@@ -27,7 +32,7 @@ export interface WarrantyRecord {
   exclusions: string | null;
   claim_contact: string | null;
   document_url: string | null;
-  ai_extracted: boolean;
+  warranty_source: WarrantySource;
   created_at: string;
 }
 

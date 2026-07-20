@@ -11,6 +11,10 @@ export interface ProductDraft {
   modelNumber: string;
   serialNumber: string;
   category: ProductCategory | "";
+  vin: string;
+  modelYear: string;
+  roomLocation: string;
+  quantity: string;
   purchaseDate: string;
   purchasePrice: string;
   retailer: string;
@@ -22,6 +26,10 @@ export const EMPTY_DRAFT: ProductDraft = {
   modelNumber: "",
   serialNumber: "",
   category: "",
+  vin: "",
+  modelYear: "",
+  roomLocation: "",
+  quantity: "1",
   purchaseDate: "",
   purchasePrice: "",
   retailer: "",
@@ -30,6 +38,7 @@ export const EMPTY_DRAFT: ProductDraft = {
 export interface SavedProduct {
   id: string;
   name: string;
+  brand: string | null;
   recallMatch: {
     description: string | null;
     remedy: string | null;

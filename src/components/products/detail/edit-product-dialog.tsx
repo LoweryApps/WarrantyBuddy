@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AuthInput } from "@/components/auth/auth-input";
 import { CategorySelect } from "@/components/products/category-select";
 import type { ProductRecord } from "@/components/products/detail/types";
+import { RoomLocationField } from "@/components/products/room-location-select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +33,12 @@ export function EditProductDialog({
   const [modelNumber, setModelNumber] = useState(product.model_number ?? "");
   const [serialNumber, setSerialNumber] = useState(product.serial_number ?? "");
   const [category, setCategory] = useState(product.category);
+  const [vin, setVin] = useState(product.vin ?? "");
+  const [modelYear, setModelYear] = useState(
+    product.model_year !== null ? String(product.model_year) : "",
+  );
+  const [roomLocation, setRoomLocation] = useState(product.room_location ?? "");
+  const [quantity, setQuantity] = useState(String(product.quantity));
   const [purchaseDate, setPurchaseDate] = useState(product.purchase_date ?? "");
   const [purchasePrice, setPurchasePrice] = useState(
     product.purchase_price !== null ? String(product.purchase_price) : "",
@@ -56,6 +63,10 @@ export function EditProductDialog({
         model_number: modelNumber.trim() || null,
         serial_number: serialNumber.trim() || null,
         category,
+        vin: category === "Vehicle" ? vin.trim() || null : null,
+        model_year: category === "Vehicle" && modelYear ? Number(modelYear) : null,
+        room_location: roomLocation.trim() || null,
+        quantity: quantity ? Number(quantity) : 1,
         purchase_date: purchaseDate || null,
         purchase_price: purchasePrice ? Number(purchasePrice) : null,
         retailer: retailer.trim() || null,
@@ -99,7 +110,7 @@ export function EditProductDialog({
           <div className="grid grid-cols-2 gap-2.5">
             <div className="space-y-1.5">
               <Label className="text-xs font-medium text-ink">
-                Brand <span className="text-red">*</span>
+                {category === "Vehicle" ? "Make" : "Brand"} <span className="text-red">*</span>
               </Label>
               <AuthInput value={brand} onChange={(e) => setBrand(e.target.value)} />
             </div>
@@ -119,6 +130,41 @@ export function EditProductDialog({
               Category <span className="text-red">*</span>
             </Label>
             <CategorySelect value={category} onChange={setCategory} />
+          </div>
+
+          {category === "Vehicle" ? (
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-ink">VIN</Label>
+                <AuthInput value={vin} onChange={(e) => setVin(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-ink">Model year</Label>
+                <AuthInput
+                  type="number"
+                  inputMode="numeric"
+                  value={modelYear}
+                  onChange={(e) => setModelYear(e.target.value)}
+                />
+              </div>
+            </div>
+          ) : null}
+
+          <div className="grid grid-cols-2 gap-2.5">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-ink">Room / location</Label>
+              <RoomLocationField value={roomLocation} onChange={setRoomLocation} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-ink">Quantity</Label>
+              <AuthInput
+                type="number"
+                min={1}
+                inputMode="numeric"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2.5">

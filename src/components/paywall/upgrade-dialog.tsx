@@ -12,9 +12,10 @@ const PREMIUM_PERKS = [
   "Unlimited registered products",
   "Unlimited receipt forwarding",
   "Buddy AI warranty extraction",
+  "AI-Suggested warranty search",
   "Claim Assist + AI email draft",
   "Ask Buddy chat",
-  "Data export (CSV)",
+  "Insurance-ready inventory export",
 ];
 
 export function UpgradeDialog({

@@ -50,3 +50,14 @@ export function estimateStandardWarrantyEndDate(purchaseDate: string): string {
   const dd = String(date.getDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
 }
+
+// Used to turn a Warranty Search (2.2b) duration-in-months suggestion into a
+// concrete end date, when the product has a purchase date on file.
+export function addMonthsToDateOnly(dateStr: string, months: number): string {
+  const date = parseDateOnly(dateStr);
+  date.setMonth(date.getMonth() + months);
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}

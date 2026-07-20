@@ -6,6 +6,7 @@ import type {
   RecallAlertRecord,
   WarrantyRecord,
 } from "@/components/products/detail/types";
+import { loadPremiumStatus } from "@/lib/get-entitlements";
 import { createClient } from "@/lib/supabase/server";
 
 interface ProductWithRelations extends ProductRecord {
@@ -20,12 +21,15 @@ export default async function ProductDetailPage({
 }) {
   const { productId } = await params;
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const [{ data: product, error }, { data: recallAlerts }] = await Promise.all([
+  const [{ data: product, error }, { data: recallAlerts }, premium] = await Promise.all([
     supabase
       .from("products")
       .select(
-        "id, name, brand, model_number, serial_number, category, purchase_date, purchase_price, retailer, photo_url, warranties(id, warranty_type, start_date, end_date, coverage_description, exclusions, claim_contact, document_url, ai_extracted, created_at), documents(id, document_type, file_url, file_name, file_size_kb, uploaded_at)",
+        "id, name, brand, model_number, serial_number, category, vin, model_year, room_location, quantity, purchase_date, purchase_price, retailer, photo_url, warranties(id, warranty_type, start_date, end_date, coverage_description, exclusions, claim_contact, document_url, warranty_source, created_at), documents(id, document_type, file_url, file_name, file_size_kb, uploaded_at)",
       )
       .eq("id", productId)
       .single()
@@ -36,6 +40,7 @@ export default async function ProductDetailPage({
       .eq("product_id", productId)
       .order("notified_at", { ascending: false })
       .returns<RecallAlertRecord[]>(),
+    user ? loadPremiumStatus(supabase, user.id) : Promise.resolve(false),
   ]);
 
   if (error || !product) {
@@ -53,6 +58,7 @@ export default async function ProductDetailPage({
       warranty={latestWarranty}
       documents={product.documents}
       recallAlerts={recallAlerts ?? []}
+      premium={premium}
     />
   );
 }

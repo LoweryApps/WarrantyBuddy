@@ -11,6 +11,8 @@ export type ProductCategory =
 
 export type WarrantyType = "Manufacturer" | "Extended" | "Retailer";
 
+export type WarrantySource = "Uploaded" | "User-Entered" | "AI-Suggested";
+
 export type DocumentType = "Warranty" | "Receipt" | "Manual" | "Photo" | "Other";
 
 export type ForwardedReceiptStatus = "Pending Review" | "Confirmed" | "Discarded";
@@ -86,6 +88,10 @@ export interface Database {
           model_number: string | null;
           serial_number: string | null;
           category: ProductCategory;
+          vin: string | null;
+          model_year: number | null;
+          room_location: string | null;
+          quantity: number;
           purchase_date: string | null;
           purchase_price: number | null;
           retailer: string | null;
@@ -100,6 +106,10 @@ export interface Database {
           model_number?: string | null;
           serial_number?: string | null;
           category?: ProductCategory;
+          vin?: string | null;
+          model_year?: number | null;
+          room_location?: string | null;
+          quantity?: number;
           purchase_date?: string | null;
           purchase_price?: number | null;
           retailer?: string | null;
@@ -128,7 +138,7 @@ export interface Database {
           exclusions: string | null;
           claim_contact: string | null;
           document_url: string | null;
-          ai_extracted: boolean;
+          warranty_source: WarrantySource;
           created_at: string;
           expiry_notified_at: string | null;
         };
@@ -142,7 +152,7 @@ export interface Database {
           exclusions?: string | null;
           claim_contact?: string | null;
           document_url?: string | null;
-          ai_extracted?: boolean;
+          warranty_source?: WarrantySource;
           created_at?: string;
           expiry_notified_at?: string | null;
         };
@@ -425,12 +435,43 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["product_intelligence"]["Insert"]>;
         Relationships: [];
       };
+      insurance_exports: {
+        Row: {
+          id: string;
+          user_id: string;
+          scope_label: string;
+          item_count: number;
+          total_value: number | null;
+          file_url: string;
+          generated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          scope_label: string;
+          item_count: number;
+          total_value?: number | null;
+          file_url: string;
+          generated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["insurance_exports"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "insurance_exports_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
     Enums: {
       product_category: ProductCategory;
       warranty_type: WarrantyType;
+      warranty_source: WarrantySource;
       document_type: DocumentType;
       forwarded_receipt_status: ForwardedReceiptStatus;
       forwarded_email_kind: ForwardedEmailKind;

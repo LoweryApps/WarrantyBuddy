@@ -102,11 +102,21 @@ export default async function DashboardPage() {
       <div className="mb-3 flex items-center justify-between">
         <div className="text-[13px] font-medium text-foreground">Your vault</div>
         {productList.length > 0 ? (
-          <Link href="/products/new">
-            <Button className="h-8 rounded-lg bg-navy px-3 text-[11px] font-medium text-white hover:bg-navy/90">
-              + Add product
-            </Button>
-          </Link>
+          <div className="flex gap-1.5">
+            <Link href="/insurance-export">
+              <Button
+                variant="outline"
+                className="h-8 rounded-lg border-border bg-white px-3 text-[11px] font-medium text-foreground hover:bg-cloud"
+              >
+                Export for insurance
+              </Button>
+            </Link>
+            <Link href="/products/new">
+              <Button className="h-8 rounded-lg bg-navy px-3 text-[11px] font-medium text-white hover:bg-navy/90">
+                + Add product
+              </Button>
+            </Link>
+          </div>
         ) : null}
       </div>
 
