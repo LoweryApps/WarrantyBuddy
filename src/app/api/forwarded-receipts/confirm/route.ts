@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { FREE_RECEIPT_MONTHLY_LIMIT, getMonthlyConfirmedReceiptCount, isPremium } from "@/lib/entitlements";
+import { findRecallMatch } from "@/lib/recall-match";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -112,13 +113,7 @@ export async function POST(request: Request) {
     productId = newProduct.id;
 
     if (newProduct.brand && newProduct.model_number) {
-      const { data: recallMatch } = await supabase
-        .from("recalls")
-        .select("id, source, description, remedy")
-        .ilike("brand", newProduct.brand)
-        .contains("model_numbers", [newProduct.model_number])
-        .limit(1)
-        .maybeSingle();
+      const recallMatch = await findRecallMatch(supabase, newProduct.brand, newProduct.model_number);
 
       if (recallMatch) {
         await supabase.from("user_recall_alerts").insert({

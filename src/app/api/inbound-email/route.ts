@@ -50,11 +50,15 @@ export async function POST(request: Request) {
   const payload = (await request.json()) as PostmarkInboundPayload;
   const supabase = createAdminClient();
 
+  // extractAddress() already lowercases, and forwarding_address is stored
+  // lowercase — exact match, not ilike: `%`/`_` in an attacker-controlled To
+  // header would otherwise be treated as LIKE wildcards and could match (and
+  // misroute mail into) an arbitrary user's account.
   const toAddress = extractAddress(payload.To ?? "");
   const { data: profile } = await supabase
     .from("users")
     .select("id")
-    .ilike("forwarding_address", toAddress)
+    .eq("forwarding_address", toAddress)
     .maybeSingle();
 
   if (!profile) {

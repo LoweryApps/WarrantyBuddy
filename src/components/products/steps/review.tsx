@@ -9,6 +9,7 @@ import type { InputMethod, ProductDraft, SavedProduct } from "@/components/produ
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { findRecallMatch } from "@/lib/recall-match";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -114,14 +115,8 @@ export function Review({
     let recallMatch: SavedProduct["recallMatch"] = null;
 
     if (form.modelNumber.trim()) {
-      const { data: recalls } = await supabase
-        .from("recalls")
-        .select("id, source, description, remedy, action_url")
-        .ilike("brand", form.brand.trim())
-        .contains("model_numbers", [form.modelNumber.trim()])
-        .limit(1);
+      const match = await findRecallMatch(supabase, form.brand.trim(), form.modelNumber.trim());
 
-      const match = recalls?.[0];
       if (match) {
         recallMatch = {
           description: match.description,
