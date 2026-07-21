@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { SettingsView } from "@/components/settings/settings-view";
-import { isPremium } from "@/lib/entitlements";
+import { isPremium, monthStartIso } from "@/lib/entitlements";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function SettingsPage() {
@@ -14,10 +14,6 @@ export default async function SettingsPage() {
     redirect("/login");
   }
 
-  const startOfMonth = new Date();
-  startOfMonth.setDate(1);
-  startOfMonth.setHours(0, 0, 0, 0);
-
   const [{ data: profile }, { count: receiptsThisMonth }] = await Promise.all([
     supabase
       .from("users")
@@ -29,7 +25,7 @@ export default async function SettingsPage() {
     supabase
       .from("forwarded_receipts")
       .select("id", { count: "exact", head: true })
-      .gte("received_at", startOfMonth.toISOString()),
+      .gte("received_at", monthStartIso()),
   ]);
 
   if (!profile) {

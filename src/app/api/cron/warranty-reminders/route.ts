@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { buildWarrantyReminderEmail, sendEmail } from "@/lib/email";
-import { PID_SOURCE_LABEL } from "@/lib/product-intelligence";
+import { bestPidMatches, PID_SOURCE_LABEL } from "@/lib/product-intelligence";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { daysUntil, parseDateOnly, warrantyStatus } from "@/lib/warranty";
 
@@ -75,10 +75,7 @@ export async function GET(request: Request) {
         .ilike("brand", product.brand)
         .eq("is_active", true);
 
-      const modelLower = (product.model_number ?? "").toLowerCase();
-      const best = (pidMatches ?? [])
-        .filter((r) => !r.model_number || r.model_number.toLowerCase() === modelLower)
-        .sort((a, b) => b.complaint_count - a.complaint_count)[0];
+      const best = bestPidMatches(pidMatches ?? [], product.model_number)[0];
 
       if (best) {
         knownIssue = {

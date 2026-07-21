@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
 import {
   classifyInboundEmail,
@@ -16,6 +17,19 @@ import { uploadInboxFile } from "@/lib/supabase/storage";
 
 export const runtime = "nodejs";
 
+function safeEqual(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) {
+    // Node's timingSafeEqual throws on a length mismatch, so this case has
+    // to be handled separately — still run a same-length comparison first
+    // so a short-circuit on length alone isn't the only timing signal.
+    timingSafeEqual(bufA, bufA);
+    return false;
+  }
+  return timingSafeEqual(bufA, bufB);
+}
+
 function checkAuth(request: Request): boolean {
   const secret = process.env.INBOUND_EMAIL_WEBHOOK_SECRET;
   if (!secret) return false;
@@ -26,7 +40,7 @@ function checkAuth(request: Request): boolean {
 
   const decoded = Buffer.from(encoded, "base64").toString("utf-8");
   const password = decoded.split(":").slice(1).join(":");
-  return password === secret;
+  return safeEqual(password, secret);
 }
 
 function extractAddress(raw: string): string {

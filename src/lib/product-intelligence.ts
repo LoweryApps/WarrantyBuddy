@@ -17,6 +17,22 @@ export const PID_SOURCE_LABEL: Record<PidSource, string> = {
   ManufacturerBulletin: "manufacturer bulletin",
 };
 
+// Shared by every "does this product have a known issue?" lookup (Ask
+// Buddy, Claim Assist, the Add Product review screen, the Warranty tab, and
+// the warranty-reminder cron) so the definition of "best match" — an
+// unspecific-model record or an exact model match, ranked by how many
+// complaints back it — stays identical everywhere instead of five
+// independently-maintained copies of the same filter/sort.
+export function bestPidMatches<T extends { model_number: string | null; complaint_count: number }>(
+  records: T[],
+  modelNumber: string | null | undefined,
+): T[] {
+  const modelLower = (modelNumber ?? "").toLowerCase();
+  return [...records]
+    .filter((r) => !r.model_number || r.model_number.toLowerCase() === modelLower)
+    .sort((a, b) => b.complaint_count - a.complaint_count);
+}
+
 export interface PidRecord {
   brand: string;
   model_number: string | null;

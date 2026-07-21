@@ -72,7 +72,12 @@ export async function POST(request: Request) {
     source: "UPCitemdb",
   };
 
-  await admin.from("product_lookup_cache").insert(result);
+  // Two concurrent lookups of the same uncached barcode can both reach here;
+  // upsert with ignoreDuplicates so the second insert's primary-key
+  // collision is a no-op instead of an unchecked/unhandled error.
+  await admin
+    .from("product_lookup_cache")
+    .upsert(result, { onConflict: "barcode", ignoreDuplicates: true });
 
   return NextResponse.json({ found: true, origin: "live", ...result });
 }

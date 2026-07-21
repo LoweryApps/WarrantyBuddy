@@ -10,7 +10,7 @@ import {
 } from "@/lib/ask-buddy";
 import { guessMediaType } from "@/lib/document-media-type";
 import { isPremium } from "@/lib/entitlements";
-import { PID_SOURCE_LABEL } from "@/lib/product-intelligence";
+import { bestPidMatches, PID_SOURCE_LABEL } from "@/lib/product-intelligence";
 import { downloadProductFile } from "@/lib/supabase/storage";
 import { createClient } from "@/lib/supabase/server";
 import type { ProductCategory } from "@/lib/supabase/types";
@@ -234,10 +234,7 @@ export async function POST(request: Request) {
           .ilike("brand", product.brand)
           .eq("is_active", true);
 
-        const modelLower = (product.model_number ?? "").toLowerCase();
-        knownIssues = (pidMatches ?? [])
-          .filter((r) => !r.model_number || r.model_number.toLowerCase() === modelLower)
-          .sort((a, b) => b.complaint_count - a.complaint_count)
+        knownIssues = bestPidMatches(pidMatches ?? [], product.model_number)
           .slice(0, 3)
           .map((r) => ({
             failureType: r.failure_type,

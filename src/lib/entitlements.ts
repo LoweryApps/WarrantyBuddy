@@ -14,24 +14,13 @@ export function isPremium(user: SubscriptionFields | null | undefined): boolean 
   return !!user?.subscription_status && PREMIUM_STATUSES.includes(user.subscription_status);
 }
 
-function monthStartIso(): string {
+// Exported so every "since the start of this month" query in the app shares
+// one UTC definition of "this month" — a local-time Date().setDate(1) here
+// and a Date.UTC() there would quietly disagree near month boundaries on
+// any non-UTC runtime.
+export function monthStartIso(): string {
   const now = new Date();
   return new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1)).toISOString();
-}
-
-// Informational count for display — every receipt received this month,
-// regardless of status.
-export async function getMonthlyReceiptCount(
-  supabase: SupabaseClient<Database>,
-  userId: string,
-): Promise<number> {
-  const { count } = await supabase
-    .from("forwarded_receipts")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", userId)
-    .gte("received_at", monthStartIso());
-
-  return count ?? 0;
 }
 
 // Quota-consuming count for the free-tier cap — only receipts the user has

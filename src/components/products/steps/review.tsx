@@ -9,6 +9,7 @@ import type { InputMethod, ProductDraft, SavedProduct } from "@/components/produ
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { bestPidMatches } from "@/lib/product-intelligence";
 import { findRecallMatch } from "@/lib/recall-match";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -155,10 +156,7 @@ export function Review({
         .ilike("brand", form.brand.trim())
         .eq("is_active", true);
 
-      const modelLower = form.modelNumber.trim().toLowerCase();
-      const best = (brandMatches ?? [])
-        .filter((r) => !r.model_number || r.model_number.toLowerCase() === modelLower)
-        .sort((a, b) => b.complaint_count - a.complaint_count)[0];
+      const best = bestPidMatches(brandMatches ?? [], form.modelNumber.trim())[0];
 
       if (best) {
         knownIssue = {

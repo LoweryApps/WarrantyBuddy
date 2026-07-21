@@ -7,6 +7,7 @@ import { UpgradeDialog } from "@/components/paywall/upgrade-dialog";
 import { WarrantyForm, type WarrantySuggestion } from "@/components/products/detail/warranty-form";
 import type { WarrantyRecord } from "@/components/products/detail/types";
 import { Button } from "@/components/ui/button";
+import { bestPidMatches } from "@/lib/product-intelligence";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { addMonthsToDateOnly, daysUntil, warrantyStatus } from "@/lib/warranty";
@@ -138,11 +139,7 @@ export function WarrantyTab({
       .eq("is_active", true)
       .then(({ data }) => {
         if (cancelled) return;
-        const modelLower = (modelNumber ?? "").toLowerCase();
-        const best = (data ?? [])
-          .filter((r) => !r.model_number || r.model_number.toLowerCase() === modelLower)
-          .sort((a, b) => b.complaint_count - a.complaint_count)[0];
-        setKnownIssue(best ?? null);
+        setKnownIssue(bestPidMatches(data ?? [], modelNumber)[0] ?? null);
       });
 
     return () => {

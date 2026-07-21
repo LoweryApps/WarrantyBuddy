@@ -3,6 +3,7 @@ import type { KnownIssueRecord } from "@/components/product-intelligence/known-i
 import { ClaimAssistWizard } from "@/components/claims/claim-assist-wizard";
 import type { ClaimProduct, ClaimReceipt, ClaimRecall, ClaimWarranty } from "@/components/claims/types";
 import { loadPremiumStatus } from "@/lib/get-entitlements";
+import { bestPidMatches } from "@/lib/product-intelligence";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function ClaimAssistPage({
@@ -66,11 +67,7 @@ export default async function ClaimAssistPage({
       .ilike("brand", product.brand)
       .eq("is_active", true);
 
-    const modelLower = (product.model_number ?? "").toLowerCase();
-    knownIssue =
-      (pidMatches ?? [])
-        .filter((r) => !r.model_number || r.model_number.toLowerCase() === modelLower)
-        .sort((a, b) => b.complaint_count - a.complaint_count)[0] ?? null;
+    knownIssue = bestPidMatches(pidMatches ?? [], product.model_number)[0] ?? null;
   }
 
   return (
