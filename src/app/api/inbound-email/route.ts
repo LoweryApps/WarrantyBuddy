@@ -1,5 +1,6 @@
 import { timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
+import { renderToBuffer } from "@react-pdf/renderer";
 import {
   classifyInboundEmail,
   emailBodyText,
@@ -11,6 +12,7 @@ import {
   type ReceiptItemExtraction,
   type WarrantyExtraction,
 } from "@/lib/inbound-email";
+import { EmailSnapshotDocument } from "@/lib/email-snapshot-pdf";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database } from "@/lib/supabase/types";
 import { uploadInboxFile } from "@/lib/supabase/storage";
@@ -85,7 +87,8 @@ export async function POST(request: Request) {
   const subject = payload.Subject ?? "";
   const bodyText = emailBodyText(payload);
   const sender = senderDomain(payload.From ?? "");
-  const receivedAt = new Date().toISOString();
+  const receivedAtDate = new Date();
+  const receivedAt = receivedAtDate.toISOString();
 
   const attachment = (payload.Attachments ?? []).find((a) => guessAttachmentMediaType(a.ContentType));
 
@@ -107,18 +110,37 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true, routed: false, reason: "no_relevant_data" });
   }
 
+  // Stage a copy of this email — the real attachment if one was included,
+  // otherwise a PDF snapshot of the email itself — so every draft has "the
+  // original email" available as its receipt/warranty document (spec
+  // 2.4/3.5), not just ones with a literal file attached. PDF rather than
+  // HTML because the bucket's allowed_mime_types has no text/html. This
+  // only stages the bytes in a holding area (product_id is not yet known);
+  // nothing is attached to the user's account — no `documents` row, nothing
+  // visible in their vault — until they review and confirm the draft in
+  // forwarded-receipts/confirm/route.ts.
   let attachmentPath: string | null = null;
-  if (attachment && hasWarrantyData) {
-    try {
+  try {
+    if (attachment) {
       attachmentPath = await uploadInboxFile(supabase, {
         userId,
         fileName: attachment.Name,
         contentType: guessAttachmentMediaType(attachment.ContentType)!,
         data: Buffer.from(attachment.Content, "base64"),
       });
-    } catch {
-      attachmentPath = null;
+    } else {
+      const pdfBuffer = await renderToBuffer(
+        EmailSnapshotDocument({ subject, from: payload.From ?? "", receivedAt: receivedAtDate, bodyText }),
+      );
+      attachmentPath = await uploadInboxFile(supabase, {
+        userId,
+        fileName: `${subject || "forwarded-email"}.pdf`,
+        contentType: "application/pdf",
+        data: pdfBuffer,
+      });
     }
+  } catch {
+    attachmentPath = null;
   }
 
   const rows: InsertRow[] = [];
@@ -151,7 +173,7 @@ export async function POST(request: Request) {
       extracted_exclusions: attachWarranty?.exclusions ?? null,
       extracted_claim_contact: attachWarranty?.claim_contact ?? null,
       confidence_score: confidenceFromUncertain(item.uncertain.length, 5),
-      raw_email_url: attachWarranty ? attachmentPath : null,
+      raw_email_url: attachmentPath,
       received_at: receivedAt,
     });
   });
