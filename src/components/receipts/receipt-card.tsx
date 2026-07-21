@@ -92,117 +92,44 @@ export function ReceiptCard({
   async function handleConfirm() {
     setBusy(true);
     setError(null);
-    const supabase = createClient();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    try {
+      const res = await fetch("/api/forwarded-receipts/confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          draftId: draft.id,
+          productId: matchId === NEW_PRODUCT_VALUE ? null : matchId,
+          productName,
+          brand,
+          retailer,
+          orderDate,
+          price,
+          warrantyStart,
+          warrantyEnd,
+          coverage,
+          exclusions,
+          claimContact,
+        }),
+      });
+      const responseBody = await res.json();
 
-    if (!user) {
-      setError("Your session expired — please sign in again.");
-      setBusy(false);
-      return;
-    }
-
-    let productId = matchId === NEW_PRODUCT_VALUE ? null : matchId;
-
-    if (!productId) {
-      const { data: newProduct, error: insertError } = await supabase
-        .from("products")
-        .insert({
-          user_id: user.id,
-          name: productName.trim() || "Untitled product",
-          brand: brand.trim() || null,
-          retailer: retailer.trim() || null,
-          purchase_date: orderDate || null,
-          purchase_price: price ? Number(price) : null,
-          category: "Other",
-        })
-        .select("id, brand, model_number")
-        .single();
-
-      if (insertError || !newProduct) {
-        setError(insertError?.message ?? "Couldn't create the product.");
-        setBusy(false);
+      if (!res.ok) {
+        if (res.status === 402) {
+          setUpgradeOpen(true);
+          return;
+        }
+        setError(responseBody.message ?? responseBody.error ?? "Couldn't confirm this item.");
         return;
       }
-      productId = newProduct.id;
 
-      if (newProduct.brand && newProduct.model_number) {
-        const { data: recallMatch } = await supabase
-          .from("recalls")
-          .select("id, source, description, remedy")
-          .ilike("brand", newProduct.brand)
-          .contains("model_numbers", [newProduct.model_number])
-          .limit(1)
-          .maybeSingle();
-        if (recallMatch) {
-          await supabase.from("user_recall_alerts").insert({
-            user_id: user.id,
-            product_id: productId,
-            recall_id: recallMatch.id,
-          });
-
-          fetch("/api/recall-alert-email", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              productId,
-              productName: productName.trim() || "Untitled product",
-              brand: newProduct.brand,
-              modelNumber: newProduct.model_number,
-              recallSource: recallMatch.source,
-              recallDescription: recallMatch.description,
-              recallRemedy: recallMatch.remedy,
-            }),
-          }).catch(() => {
-            // Best-effort notification — never block the confirm flow.
-          });
-        }
-      }
+      setDone(true);
+      onResolved();
+    } catch {
+      setError("Couldn't confirm this item — try again.");
+    } finally {
+      setBusy(false);
     }
-
-    const hasWarrantyFields =
-      isWarranty && (warrantyStart || warrantyEnd || coverage.trim() || exclusions.trim() || claimContact.trim());
-
-    if (hasWarrantyFields) {
-      await supabase.from("warranties").insert({
-        product_id: productId,
-        warranty_type: "Manufacturer",
-        start_date: warrantyStart || null,
-        end_date: warrantyEnd || null,
-        coverage_description: coverage.trim() || null,
-        exclusions: exclusions.trim() || null,
-        claim_contact: claimContact.trim() || null,
-        document_url: draft.raw_email_url,
-        warranty_source: draft.raw_email_url ? "Uploaded" : "User-Entered",
-      });
-    }
-
-    if (draft.raw_email_url) {
-      await supabase.from("documents").insert({
-        product_id: productId,
-        document_type: isWarranty ? "Warranty" : "Receipt",
-        file_url: draft.raw_email_url,
-        file_name:
-          draft.source_email_subject ?? (isWarranty ? "Forwarded warranty document" : "Forwarded receipt"),
-      });
-    }
-
-    const { error: updateError } = await supabase
-      .from("forwarded_receipts")
-      .update({ status: "Confirmed", product_id: productId })
-      .eq("id", draft.id);
-
-    setBusy(false);
-
-    if (updateError) {
-      setError(updateError.message);
-      return;
-    }
-
-    setDone(true);
-    onResolved();
   }
 
   return (

@@ -30,6 +30,32 @@ interface VaultProductRow {
   documents: { document_type: string }[];
 }
 
+// Anthropic requires messages to strictly alternate user/assistant, starting
+// with user. If a previous turn's model call failed, the user's message was
+// still saved (so it isn't silently dropped) but no assistant reply follows
+// it — leaving two consecutive "user" rows in history the next time this
+// route runs. Left as-is, that produces an invalid request that 400s, which
+// saves only another orphaned user row and permanently breaks the thread.
+// Merging consecutive same-role turns keeps every message Buddy should see
+// while always producing a request Anthropic will accept.
+function mergeConsecutiveRoles(messages: MessageParam[]): MessageParam[] {
+  const merged: MessageParam[] = [];
+
+  for (const msg of messages) {
+    const prev = merged[merged.length - 1];
+    if (!prev || prev.role !== msg.role) {
+      merged.push({ role: msg.role, content: msg.content });
+      continue;
+    }
+
+    const prevBlocks = Array.isArray(prev.content) ? prev.content : [{ type: "text" as const, text: prev.content as string }];
+    const nextBlocks = Array.isArray(msg.content) ? msg.content : [{ type: "text" as const, text: msg.content as string }];
+    prev.content = [...prevBlocks, ...nextBlocks];
+  }
+
+  return merged;
+}
+
 async function loadVaultSummary(
   supabase: Awaited<ReturnType<typeof createClient>>,
 ): Promise<VaultProductSummary[]> {
@@ -277,13 +303,15 @@ export async function POST(request: Request) {
     vaultSummary,
   });
 
-  const anthropicMessages: MessageParam[] = history.map((m, i) => {
-    const isLast = i === history.length - 1;
-    if (isLast && m.role === "user" && documentBlock) {
-      return { role: "user", content: [documentBlock, { type: "text", text: m.content }] };
-    }
-    return { role: m.role, content: m.content };
-  });
+  const anthropicMessages: MessageParam[] = mergeConsecutiveRoles(
+    history.map((m, i) => {
+      const isLast = i === history.length - 1;
+      if (isLast && m.role === "user" && documentBlock) {
+        return { role: "user", content: [documentBlock, { type: "text", text: m.content }] };
+      }
+      return { role: m.role, content: m.content };
+    }),
+  );
 
   try {
     const client = new Anthropic({ apiKey });
