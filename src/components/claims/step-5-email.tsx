@@ -27,7 +27,7 @@ export function Step5Email({ productId }: { productId: string }) {
       });
       const body = await res.json();
       if (!res.ok) {
-        setError(body.error ?? "Couldn't draft the email. Try again.");
+        setError(body.message ?? "Couldn't draft the email. Try again.");
         return;
       }
       setEmail(body.email);

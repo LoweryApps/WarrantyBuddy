@@ -6,6 +6,7 @@ import {
   type ClaimEmailContext,
 } from "@/lib/claim-email";
 import { guessMediaType } from "@/lib/document-media-type";
+import { isPremium } from "@/lib/entitlements";
 import { classifyUserReport, upsertProductIntelligence } from "@/lib/product-intelligence";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { downloadProductFile } from "@/lib/supabase/storage";
@@ -61,6 +62,19 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const { data: premiumProfile } = await supabase
+    .from("users")
+    .select("subscription_status")
+    .eq("id", user.id)
+    .single();
+
+  if (!isPremium(premiumProfile)) {
+    return NextResponse.json(
+      { error: "premium_required", message: "Claim Assist's AI email draft is a Premium feature." },
+      { status: 402 },
+    );
   }
 
   const { productId, issue } = await request.json();
