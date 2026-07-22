@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { AppNav } from "@/components/layout/app-nav";
+import { FeedbackWidget } from "@/components/layout/feedback-widget";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AppLayout({
@@ -29,6 +30,7 @@ export default async function AppLayout({
         email={profile?.email ?? user.email ?? ""}
       />
       <div className="flex-1">{children}</div>
+      <FeedbackWidget />
     </div>
   );
 }

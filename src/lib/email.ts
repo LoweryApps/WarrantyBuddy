@@ -128,6 +128,29 @@ export function buildWarrantyReminderEmail(p: WarrantyReminderEmailParams) {
   return { subject, html: shell(body) };
 }
 
+export interface FeedbackNotificationEmailParams {
+  userEmail: string;
+  message: string;
+  pagePath: string | null;
+}
+
+// Notifies the owner of a new in-app feedback submission (beta-readiness).
+// Best-effort — the feedback row is already saved regardless of whether this
+// send succeeds.
+export function buildFeedbackNotificationEmail(p: FeedbackNotificationEmailParams) {
+  const subject = `New feedback from ${p.userEmail}`;
+  const body = `
+    <h1 style="margin:0 0 8px; font-family:'Space Grotesk', Arial, sans-serif; font-size:20px; color:${BRAND.navy};">
+      New feedback
+    </h1>
+    <p style="margin:0 0 16px; font-size:13px; color:${BRAND.ink}; text-align:left;">
+      From <strong>${escapeHtml(p.userEmail)}</strong>${p.pagePath ? ` on <code>${escapeHtml(p.pagePath)}</code>` : ""}
+    </p>
+    <div style="text-align:left; background-color:${BRAND.cloud}; border-radius:12px; padding:16px 20px; white-space:pre-wrap; font-size:14px; line-height:1.6; color:${BRAND.navy};">${escapeHtml(p.message)}</div>
+  `;
+  return { subject, html: shell(body) };
+}
+
 export async function sendEmail(params: { to: string; subject: string; html: string }): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM_EMAIL;
