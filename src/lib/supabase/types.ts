@@ -495,7 +495,12 @@ export interface Database {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      rate_limit_hit: {
+        Args: { p_bucket: string; p_window_seconds: number };
+        Returns: number;
+      };
+    };
     Enums: {
       product_category: ProductCategory;
       warranty_type: WarrantyType;
