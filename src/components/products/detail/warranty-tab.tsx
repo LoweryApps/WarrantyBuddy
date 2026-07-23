@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Phone, Sparkles } from "lucide-react";
+import { ArrowRight, Phone, Sparkles } from "lucide-react";
 import { KnownIssueBanner, type KnownIssueRecord } from "@/components/product-intelligence/known-issue-banner";
 import { UpgradeDialog } from "@/components/paywall/upgrade-dialog";
 import { WarrantyForm, type WarrantySuggestion } from "@/components/products/detail/warranty-form";
@@ -159,7 +159,7 @@ export function WarrantyTab({
             type="button"
             disabled={searching}
             onClick={handleSearch}
-            className="mb-3.5 flex w-full items-center justify-between rounded-xl border border-teal/30 bg-teal/5 p-3.5 text-left disabled:opacity-70"
+            className="mb-3.5 flex w-full items-center justify-between gap-3 rounded-xl border-2 border-teal/40 bg-white p-3.5 text-left shadow-sm transition-colors hover:border-teal hover:bg-teal/5 active:bg-teal/10 disabled:cursor-default disabled:opacity-70 disabled:hover:border-teal/40 disabled:hover:bg-white"
           >
             <div>
               <div className="flex items-center gap-1.5 text-xs font-medium text-navy">
@@ -167,9 +167,10 @@ export function WarrantyTab({
                 {searching ? "Buddy is searching…" : "Search for warranty terms"}
               </div>
               <div className="mt-0.5 text-[11px] text-ink">
-                Let Buddy look up this manufacturer&apos;s standard warranty online
+                Buddy looks up this manufacturer&apos;s standard warranty online
               </div>
             </div>
+            {!searching ? <ArrowRight className="h-4 w-4 shrink-0 text-teal" /> : null}
           </button>
         ) : null}
 

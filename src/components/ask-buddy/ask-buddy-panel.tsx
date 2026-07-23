@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FileText, Send, X } from "lucide-react";
 import { PaywallBlock } from "@/components/paywall/paywall-block";
@@ -253,6 +254,38 @@ export function AskBuddyPanel(props: AskBuddyPanelProps) {
   );
 }
 
+// Buddy is instructed (see buildSystemPrompt) to emit markdown links —
+// [text](/products/...) — when referencing a specific product, warranty, or
+// document, instead of describing where to find it in prose. This renders
+// just that one construct as a real clickable link; everything else in the
+// message stays plain text, so no general markdown library is needed.
+const MARKDOWN_LINK = /\[([^\]]+)\]\(([^)]+)\)/g;
+
+function renderMessageContent(content: string): React.ReactNode[] {
+  const nodes: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let key = 0;
+
+  MARKDOWN_LINK.lastIndex = 0;
+  while ((match = MARKDOWN_LINK.exec(content)) !== null) {
+    if (match.index > lastIndex) {
+      nodes.push(content.slice(lastIndex, match.index));
+    }
+    const [, label, href] = match;
+    nodes.push(
+      <Link key={`link-${key++}`} href={href} className="font-medium text-teal underline underline-offset-2">
+        {label}
+      </Link>,
+    );
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < content.length) {
+    nodes.push(content.slice(lastIndex));
+  }
+  return nodes;
+}
+
 function ChatBubble({ message }: { message: ChatMessageRow }) {
   if (message.role === "user") {
     return (
@@ -268,7 +301,7 @@ function ChatBubble({ message }: { message: ChatMessageRow }) {
     <div className="flex items-start gap-2">
       <Image src="/brand/buddy-soft.svg" alt="" width={20} height={25} className="mt-0.5 shrink-0" />
       <div className="max-w-[80%] rounded-[0_10px_10px_10px] bg-cloud px-2.5 py-2 text-[12px] leading-relaxed whitespace-pre-wrap text-foreground">
-        {message.content}
+        {renderMessageContent(message.content)}
         {message.source ? (
           <div className="mt-1.5 flex items-center gap-1 border-t border-border pt-1.5 text-[10px] text-ink">
             <FileText className="h-2.5 w-2.5 shrink-0" />

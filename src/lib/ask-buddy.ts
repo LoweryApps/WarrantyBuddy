@@ -42,6 +42,7 @@ export interface ProductContext {
 }
 
 export interface VaultProductSummary {
+  id: string;
   name: string;
   brand: string | null;
   modelNumber: string | null;
@@ -69,11 +70,12 @@ function todayIso(): string {
 
 export function buildSystemPrompt(params: {
   mode: "product" | "vault";
+  productId: string | null;
   product: ProductContext | null;
   hasDocumentBytes: boolean;
   vaultSummary: VaultProductSummary[];
 }): string {
-  const { mode, product, hasDocumentBytes, vaultSummary } = params;
+  const { mode, productId, product, hasDocumentBytes, vaultSummary } = params;
 
   const vaultLines = vaultSummary.length
     ? vaultSummary
@@ -88,7 +90,7 @@ export function buildSystemPrompt(params: {
             p.hasDocument ? "has warranty document" : "no warranty document uploaded",
             p.hasRecall ? "HAS AN ACTIVE RECALL" : null,
           ].filter(Boolean);
-          return `- ${bits.join(" · ")}`;
+          return `- [id: ${p.id}] ${bits.join(" · ")}`;
         })
         .join("\n")
     : "(vault is empty — no products yet)";
@@ -96,6 +98,7 @@ export function buildSystemPrompt(params: {
   const productBlock = product
     ? `
 Current product context:
+- id: ${productId}
 - Name: ${product.name}
 - Brand: ${product.brand ?? "unknown"}
 - Model number: ${product.modelNumber ?? "unknown"}
@@ -138,6 +141,10 @@ Full vault summary (${vaultSummary.length} product${vaultSummary.length === 1 ? 
 ${vaultLines}
 
 Rules:
+- When you reference a specific product, its warranty, or its documents, link to it inline with markdown link syntax instead of describing where to find it in prose — e.g. write "your [Sony Bravia](/products/abc123) is covered until March" or "check [its Documents tab](/products/abc123?tab=documents) for the receipt", never "you can find this on the product page." Use only these route patterns, filled in with a real id from the "id:" fields given to you above (the current product's id, or a vault-item's [id: ...] tag) — never invent an id or link a product you have no id for:
+  - /products/{id} — that product's overview
+  - /products/{id}?tab=warranty — its Warranty tab
+  - /products/{id}?tab=documents — its Documents tab
 - Ground answers in the warranty document text when one is attached, or in the structured warranty/recall/vault facts above. Never fabricate coverage terms, dates, phone numbers, or dollar amounts that aren't given to you.
 - If a product-specific question has no warranty document and no warranty record, say so plainly, then answer using well-known standard manufacturer terms for that brand/category if you can, and clearly label that as a general assumption, not this user's actual coverage.
 - Keep answers short — a few sentences or a tight list. This is a chat panel, not an essay.

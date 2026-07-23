@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { ChevronLeft, TriangleAlert } from "lucide-react";
 import { AskBuddyPanel } from "@/components/ask-buddy/ask-buddy-panel";
@@ -22,6 +22,8 @@ import { WarrantyTab } from "@/components/products/detail/warranty-tab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { warrantyStatus } from "@/lib/warranty";
 
+const VALID_TABS = ["overview", "warranty", "documents", "recalls"];
+
 export function ProductDetailView({
   product,
   warranty,
@@ -36,7 +38,14 @@ export function ProductDetailView({
   premium: boolean;
 }) {
   const router = useRouter();
-  const [tab, setTab] = useState("overview");
+  const searchParams = useSearchParams();
+  // Deep-linkable from outside (e.g. Ask Buddy replies use ?tab=warranty /
+  // ?tab=documents) — falls back to overview for a missing or invalid value,
+  // same as before this param existed.
+  const initialTab = searchParams.get("tab");
+  const [tab, setTab] = useState(
+    initialTab && VALID_TABS.includes(initialTab) ? initialTab : "overview",
+  );
   const [editOpen, setEditOpen] = useState(false);
   const [buddyOpen, setBuddyOpen] = useState(false);
 

@@ -75,6 +75,7 @@ async function loadVaultSummary(
     )[0];
     const endDate = latestWarranty?.end_date ?? null;
     return {
+      id: p.id,
       name: p.name,
       brand: p.brand,
       modelNumber: p.model_number,
@@ -295,6 +296,7 @@ export async function POST(request: Request) {
 
   const systemPrompt = buildSystemPrompt({
     mode: productId ? "product" : "vault",
+    productId: productId ?? null,
     product: productContext,
     hasDocumentBytes: !!documentBlock,
     vaultSummary,
