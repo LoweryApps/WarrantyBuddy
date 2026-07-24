@@ -185,6 +185,7 @@ export function WarrantyTab({
           productId={productId}
           existing={warranty}
           suggestion={!warranty ? suggestion : null}
+          purchaseDate={purchaseDate}
           onSaved={() => {
             setEditing(false);
             setSuggestion(null);

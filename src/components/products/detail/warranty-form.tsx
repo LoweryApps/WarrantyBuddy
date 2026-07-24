@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AlertTriangle, Sparkles, Upload } from "lucide-react";
+import { AlertTriangle, ArrowRight, Pencil, Sparkles, Upload } from "lucide-react";
 import { AuthInput } from "@/components/auth/auth-input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import { uploadProductFile } from "@/lib/supabase/storage";
 import type { WarrantyRecord } from "@/components/products/detail/types";
 import type { WarrantyType } from "@/lib/supabase/types";
 import { cn } from "@/lib/utils";
+import { addMonthsToDateOnly } from "@/lib/warranty";
 
 const WARRANTY_TYPES: WarrantyType[] = ["Manufacturer", "Extended", "Retailer"];
 
@@ -87,12 +88,14 @@ export function WarrantyForm({
   productId,
   existing,
   suggestion,
+  purchaseDate,
   onSaved,
   onCancel,
 }: {
   productId: string;
   existing: WarrantyRecord | null;
   suggestion?: WarrantySuggestion | null;
+  purchaseDate?: string | null;
   onSaved: () => void;
   onCancel?: () => void;
 }) {
@@ -136,6 +139,20 @@ export function WarrantyForm({
     ),
   );
   const [usedAi, setUsedAi] = useState(false);
+  // Choice-first: for a brand-new warranty (no existing record, no AI
+  // suggestion) the long manual form stays collapsed behind an "Enter details
+  // manually" card, so Search / Upload / Manual read as three choices rather
+  // than the form landing as homework. Editing or a suggestion reveals it.
+  const [showManualFields, setShowManualFields] = useState(!!existing || !!suggestion);
+
+  // Base date for the duration quick-select: the warranty start if set,
+  // otherwise the product's purchase date.
+  const durationBase = startDate || purchaseDate || "";
+  function applyDuration(years: number) {
+    if (!durationBase) return;
+    if (!startDate && purchaseDate) setStartDate(purchaseDate);
+    setEndDate(addMonthsToDateOnly(durationBase, years * 12));
+  }
 
   async function handleFile(file: File) {
     setUploading(true);
@@ -165,6 +182,9 @@ export function WarrantyForm({
       });
       setDocumentPath(path);
       setDocumentName(file.name);
+      // A document is now on file — reveal the fields so the user can confirm
+      // what Buddy reads, or fill them in if extraction comes back empty.
+      setShowManualFields(true);
     } catch (e) {
       setUploading(false);
       setUploadNotice({
@@ -339,6 +359,25 @@ export function WarrantyForm({
         ) : null}
       </div>
 
+      {!showManualFields ? (
+        <button
+          type="button"
+          onClick={() => setShowManualFields(true)}
+          className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-white p-3.5 text-left shadow-sm transition-colors hover:border-ink/40 hover:bg-cloud active:bg-cloud"
+        >
+          <div>
+            <div className="flex items-center gap-1.5 text-xs font-medium text-navy">
+              <Pencil className="h-3.5 w-3.5 text-ink" />
+              Enter details manually
+            </div>
+            <div className="mt-0.5 text-[11px] text-ink">Type in warranty dates and coverage yourself</div>
+          </div>
+          <ArrowRight className="h-4 w-4 shrink-0 text-ink" />
+        </button>
+      ) : null}
+
+      {showManualFields ? (
+        <>
       <div className="space-y-1.5">
         <Label className="text-xs font-medium text-ink">Warranty type</Label>
         <Select value={warrantyType} onValueChange={(v) => setWarrantyType(v as WarrantyType)}>
@@ -378,6 +417,24 @@ export function WarrantyForm({
             className={inputClass("end_date")}
           />
         </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="text-[11px] text-ink">Quick set end date:</span>
+        {[1, 2, 3].map((years) => (
+          <button
+            key={years}
+            type="button"
+            disabled={!durationBase}
+            onClick={() => applyDuration(years)}
+            className="rounded-md border border-border bg-white px-2 py-1 text-[11px] font-medium text-navy transition-colors hover:border-teal disabled:opacity-50 disabled:hover:border-border"
+          >
+            {years} year{years > 1 ? "s" : ""}
+          </button>
+        ))}
+        {!durationBase ? (
+          <span className="text-[10px] text-ink/70">— add a start date first</span>
+        ) : null}
       </div>
 
       <div className="space-y-1.5">
@@ -441,6 +498,8 @@ export function WarrantyForm({
           {saving ? "Saving…" : "Save warranty"}
         </Button>
       </div>
+        </>
+      ) : null}
     </div>
   );
 }

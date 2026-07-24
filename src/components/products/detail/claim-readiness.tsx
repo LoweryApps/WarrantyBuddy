@@ -177,18 +177,23 @@ export function ClaimReadiness({
     <div className="mb-4">
       <div className="flex items-start justify-between gap-3">
         {children}
-        <button
-          type="button"
-          onClick={() => setOpen((o) => !o)}
-          aria-label={`Claim-readiness score ${score} out of 100 — ${CLAIM_READINESS_LABEL[band]}`}
-          className={cn(
-            "flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-full border-[3px] transition-colors",
-            RING_COLOR[band],
-          )}
-        >
-          <span className="text-sm font-semibold text-navy">{score}</span>
-          <span className="text-[8px] text-ink">/100</span>
-        </button>
+        <div className="flex shrink-0 flex-col items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            aria-label={`Claim-readiness score ${score} out of 100 — ${CLAIM_READINESS_LABEL[band]}`}
+            className={cn(
+              "flex h-14 w-14 flex-col items-center justify-center rounded-full border-[3px] transition-colors",
+              RING_COLOR[band],
+            )}
+          >
+            <span className="text-sm font-semibold text-navy">{score}</span>
+            <span className="text-[8px] text-ink">/100</span>
+          </button>
+          <span className="text-[9px] font-medium tracking-wide text-ink uppercase">
+            Claim readiness
+          </span>
+        </div>
       </div>
 
       {open ? (
