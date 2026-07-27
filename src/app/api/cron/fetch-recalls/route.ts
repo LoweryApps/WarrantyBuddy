@@ -196,10 +196,7 @@ export async function GET(request: Request) {
   try {
     // A week's lookback (not just "since yesterday") so a missed or delayed
     // run doesn't silently drop a day's recalls — dedup on
-    // (source, external_recall_id) makes the overlap free. Twice-daily
-    // fetching only changes how quickly new recalls are caught, not how many
-    // AI extraction calls happen: that runs only for genuinely new or
-    // materially amended rows below.
+    // (source, external_recall_id) makes the overlap free.
     const raw = await fetchCpscRecalls(daysAgoIso(7));
     cpscFetched = raw.length;
 
@@ -219,7 +216,7 @@ export async function GET(request: Request) {
       }
 
       // Compare raw agency text first — no AI call unless it actually
-      // changed, so re-fetching the same recall twice a day is nearly free.
+      // changed, so re-fetching an unchanged recall on the next run is free.
       const rawCmp = cpscRawComparable(r);
       const changed =
         (rawCmp.description ?? "") !== (existing.description ?? "") ||

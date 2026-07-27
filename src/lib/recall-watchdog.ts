@@ -11,7 +11,8 @@ import type { RecallSource } from "@/lib/supabase/types";
 
 type AdminClient = ReturnType<typeof createAdminClient>;
 
-// One missed twice-daily cycle (12h) plus buffer.
+// 36h — a full missed daily cycle (24h) plus buffer, so one delayed or
+// briefly-failed run doesn't alone trigger an alert.
 const STALE_AFTER_MS = 36 * 60 * 60 * 1000;
 // Don't re-alert about the same ongoing outage more than this often.
 const ALERT_THROTTLE_MS = 12 * 60 * 60 * 1000;
