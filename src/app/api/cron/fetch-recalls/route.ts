@@ -307,12 +307,19 @@ export async function GET(request: Request) {
   // Covers three openFDA endpoints (food/drug/device) under one "FDA" bucket.
   // A single center's outage shouldn't block the other two, but if all three
   // fail the whole fetch is recorded as failed so the watchdog can see it.
+  //
+  // 30-day lookback (not 7, like CPSC/NHTSA): openFDA's own dataset lags its
+  // "current" date by 1-2+ weeks in practice (confirmed live — its metadata
+  // reported last_updated 12 days behind "today" during testing), so a
+  // report_date from this week may not actually be queryable for a while.
+  // A 7-day window would permanently miss anything that arrives late; dedup
+  // on (source, external_recall_id) makes the wider overlap free.
   await recordFetchAttempt(supabase, "FDA");
   try {
     const centerErrors: FdaEnforcementCenter[] = [];
     for (const center of FDA_CENTERS) {
       try {
-        const raw = await fetchFdaRecalls(center, daysAgoIso(7));
+        const raw = await fetchFdaRecalls(center, daysAgoIso(30));
         fdaFetched += raw.length;
 
         for (const r of raw) {
