@@ -8,6 +8,18 @@ const PUBLIC_PATHS = [
   "/reset-password",
   "/verify-email",
   "/auth/confirm",
+  // Public, no-login SEO surface (Public Recall Pages module). The whole
+  // /recalls/* tree is anonymous, cached, and indexable — the authenticated
+  // personal recall-alerts view lives at /alerts instead.
+  "/recalls",
+  // Public legal pages (linked from the recall-pages footer).
+  "/terms",
+  "/privacy",
+  // Public recall-digest signup (anonymous, double opt-in) — not app users.
+  "/api/recall-subscribe",
+  // Crawler-facing generated files — must be reachable without a session.
+  "/robots.txt",
+  "/sitemap.xml",
   // Server-to-server routes with their own bearer-token auth (checked inside
   // the route handler) — these are called by Vercel Cron / curl, never by a
   // logged-in browser, so they carry no session cookie to check here.

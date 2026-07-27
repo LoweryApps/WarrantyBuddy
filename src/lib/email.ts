@@ -128,6 +128,32 @@ export function buildWarrantyReminderEmail(p: WarrantyReminderEmailParams) {
   return { subject, html: shell(body) };
 }
 
+export interface RecallDigestConfirmEmailParams {
+  confirmUrl: string;
+  unsubscribeUrl: string;
+  scopeDescription: string; // e.g. "new appliance recalls" or "all new recalls"
+}
+
+// Double opt-in confirmation for a public recall-digest signup (addendum §1.2).
+// No recall content is ever sent until this link is clicked.
+export function buildRecallDigestConfirmEmail(p: RecallDigestConfirmEmailParams) {
+  const subject = "Confirm your WarrantyBuddy recall updates";
+  const body = `
+    <h1 style="margin:0 0 8px; font-family:'Space Grotesk', Arial, sans-serif; font-size:20px; color:${BRAND.navy};">
+      Confirm your recall updates
+    </h1>
+    <p style="margin:0 0 20px; font-size:14px; line-height:1.6; color:${BRAND.ink}; text-align:left;">
+      You asked to get an email when there are ${escapeHtml(p.scopeDescription)}. Click below to confirm — we won't send anything until you do.
+    </p>
+    ${ctaButton(p.confirmUrl, "Confirm my updates")}
+    <p style="margin:24px 0 0; font-size:12px; line-height:1.6; color:${BRAND.ink};">
+      If you didn't request this, you can ignore this email and nothing will be sent. You can
+      <a href="${p.unsubscribeUrl}" style="color:${BRAND.ink};">unsubscribe</a> at any time.
+    </p>
+  `;
+  return { subject, html: shell(body) };
+}
+
 export interface FeedbackNotificationEmailParams {
   userEmail: string;
   message: string;

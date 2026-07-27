@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/fetch-recalls",
-      "schedule": "0 12 * * *"
+      "schedule": "0 6,18 * * *"
     },
     {
       "path": "/api/cron/warranty-reminders",

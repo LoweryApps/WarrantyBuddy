@@ -322,6 +322,26 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["recalls"]["Insert"]>;
         Relationships: [];
       };
+      recall_fetch_status: {
+        Row: {
+          source: RecallSource;
+          last_attempt_at: string | null;
+          last_success_at: string | null;
+          last_error: string | null;
+          last_error_at: string | null;
+          alerted_at: string | null;
+        };
+        Insert: {
+          source: RecallSource;
+          last_attempt_at?: string | null;
+          last_success_at?: string | null;
+          last_error?: string | null;
+          last_error_at?: string | null;
+          alerted_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["recall_fetch_status"]["Insert"]>;
+        Relationships: [];
+      };
       user_recall_alerts: {
         Row: {
           id: string;

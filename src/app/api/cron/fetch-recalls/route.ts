@@ -3,14 +3,29 @@ import { buildRecallAlertEmail, sendEmail } from "@/lib/email";
 import { aggregateNhtsaComplaints, fetchNhtsaComplaints, upsertProductIntelligence } from "@/lib/product-intelligence";
 import {
   fetchCpscRecalls,
+  fetchFdaRecalls,
   fetchNhtsaRecalls,
+  fetchUsdaRecalls,
   normalizeCpscRecall,
+  normalizeFdaRecall,
   normalizeNhtsaRecall,
+  normalizeUsdaRecall,
+  FDA_CENTERS,
+  type CpscApiRecall,
+  type FdaEnforcementCenter,
   type NormalizedRecall,
 } from "@/lib/recall-sources";
+import {
+  checkFreshnessAndAlert,
+  recordFetchAttempt,
+  recordFetchFailure,
+  recordFetchSuccess,
+} from "@/lib/recall-watchdog";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
+
+type AdminClient = ReturnType<typeof createAdminClient>;
 
 function daysAgoIso(days: number): string {
   const d = new Date();
@@ -18,34 +33,27 @@ function daysAgoIso(days: number): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-async function insertRecallAndAlert(
-  supabase: ReturnType<typeof createAdminClient>,
+// Order-insensitive array equality for the model-number amendment check.
+function sameModels(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false;
+  const sortedA = [...a].sort();
+  const sortedB = [...b].sort();
+  return sortedA.every((v, i) => v === sortedB[i]);
+}
+
+// Matches a stored recall against registered products and fires per-user
+// alerts + emails.
+async function matchAndAlert(
+  supabase: AdminClient,
   recall: NormalizedRecall,
+  recallId: string,
   appUrl: string,
 ) {
-  const { data: inserted, error } = await supabase
-    .from("recalls")
-    .insert({
-      source: recall.source,
-      external_recall_id: recall.external_recall_id,
-      recall_date: recall.recall_date,
-      brand: recall.brand,
-      model_numbers: recall.model_numbers,
-      description: recall.description,
-      remedy: recall.remedy,
-      action_url: recall.action_url,
-    })
-    .select("id")
-    .single();
+  if (!recall.brand || recall.model_numbers.length === 0) return;
 
-  // Duplicate (source, external_recall_id) or missing brand/model — nothing
-  // to match against, either way.
-  if (error || !inserted || !recall.brand || recall.model_numbers.length === 0) return;
-
-  // PostgREST's .in() is exact-match, and government sources often stem
-  // model numbers in different casing than a user typed them (e.g. NHTSA's
-  // "CIVIC" vs. a product's "Civic") — filter case-insensitively in JS
-  // instead of relying on SQL for the model_number half of the match.
+  // PostgREST's .in() is exact-match, and government sources often stem model
+  // numbers in different casing than a user typed them (e.g. NHTSA's "CIVIC"
+  // vs. a product's "Civic") — filter case-insensitively in JS instead.
   const { data: brandMatches } = await supabase
     .from("products")
     .select("id, user_id, name, brand, model_number")
@@ -62,14 +70,14 @@ async function insertRecallAndAlert(
       .select("id")
       .eq("user_id", product.user_id)
       .eq("product_id", product.id)
-      .eq("recall_id", inserted.id)
+      .eq("recall_id", recallId)
       .maybeSingle();
     if (alreadyAlerted) continue;
 
     await supabase.from("user_recall_alerts").insert({
       user_id: product.user_id,
       product_id: product.id,
-      recall_id: inserted.id,
+      recall_id: recallId,
     });
 
     const { data: profile } = await supabase
@@ -98,6 +106,66 @@ async function insertRecallAndAlert(
   }
 }
 
+// Inserts a brand-new recall (raw agency fields only — no slug, no AI
+// summary, no public-page revalidation; those belong to the tabled public
+// recall pages module, not the in-app beta monitor), then runs alert
+// matching.
+async function insertNewRecall(
+  supabase: AdminClient,
+  recall: NormalizedRecall,
+  appUrl: string,
+): Promise<boolean> {
+  const { data: inserted, error } = await supabase
+    .from("recalls")
+    .insert({
+      source: recall.source,
+      external_recall_id: recall.external_recall_id,
+      recall_date: recall.recall_date,
+      brand: recall.brand,
+      model_numbers: recall.model_numbers,
+      description: recall.description,
+      remedy: recall.remedy,
+      action_url: recall.action_url,
+    })
+    .select("id")
+    .single();
+
+  // A concurrent run may have inserted the same (source, external_recall_id)
+  // between our existence check and this insert — the unique constraint makes
+  // that a no-op rather than a duplicate row.
+  if (error || !inserted) return false;
+
+  await matchAndAlert(supabase, recall, inserted.id, appUrl);
+  return true;
+}
+
+// Applies a material amendment: overwrites the raw fields only. No AI content
+// to clear/regenerate and no page to revalidate in the beta-scope monitor.
+async function applyAmendment(supabase: AdminClient, recallId: string, recall: NormalizedRecall): Promise<void> {
+  await supabase
+    .from("recalls")
+    .update({
+      recall_date: recall.recall_date,
+      brand: recall.brand,
+      model_numbers: recall.model_numbers,
+      description: recall.description,
+      remedy: recall.remedy,
+      action_url: recall.action_url,
+    })
+    .eq("id", recallId);
+}
+
+// Raw comparable fields for a CPSC recall, computed WITHOUT the AI brand/model
+// extraction so an unchanged recall never triggers a Claude call. These mirror
+// the formulas normalizeCpscRecall() stores, so the comparison is apples to
+// apples against the persisted row.
+function cpscRawComparable(r: CpscApiRecall): { description: string | null; remedy: string | null } {
+  return {
+    description: r.Description ?? r.Title ?? null,
+    remedy: (r.Remedies ?? []).map((x) => x.Name).filter(Boolean).join(" ") || null,
+  };
+}
+
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
   const authHeader = request.headers.get("authorization");
@@ -111,38 +179,70 @@ export async function GET(request: Request) {
 
   let cpscFetched = 0;
   let cpscNew = 0;
+  let cpscAmended = 0;
   let nhtsaQueried = 0;
   let nhtsaNew = 0;
+  let nhtsaAmended = 0;
+  let fdaFetched = 0;
+  let fdaNew = 0;
+  let fdaAmended = 0;
+  let usdaFetched = 0;
+  let usdaNew = 0;
+  let usdaAmended = 0;
   let pidPatternsUpdated = 0;
 
+  // ── CPSC ────────────────────────────────────────────────────────────────
+  await recordFetchAttempt(supabase, "CPSC");
   try {
     // A week's lookback (not just "since yesterday") so a missed or delayed
-    // cron run doesn't silently drop a day's recalls — dedup on
-    // (source, external_recall_id) makes the overlap free.
+    // run doesn't silently drop a day's recalls — dedup on
+    // (source, external_recall_id) makes the overlap free. Twice-daily
+    // fetching only changes how quickly new recalls are caught, not how many
+    // AI extraction calls happen: that runs only for genuinely new or
+    // materially amended rows below.
     const raw = await fetchCpscRecalls(daysAgoIso(7));
     cpscFetched = raw.length;
 
     for (const r of raw) {
+      const externalId = String(r.RecallID);
       const { data: existing } = await supabase
         .from("recalls")
-        .select("id")
+        .select("id, description, remedy")
         .eq("source", "CPSC")
-        .eq("external_recall_id", String(r.RecallID))
+        .eq("external_recall_id", externalId)
         .maybeSingle();
-      if (existing) continue;
+
+      if (!existing) {
+        const normalized = await normalizeCpscRecall(r);
+        if (await insertNewRecall(supabase, normalized, appUrl)) cpscNew += 1;
+        continue;
+      }
+
+      // Compare raw agency text first — no AI call unless it actually
+      // changed, so re-fetching the same recall twice a day is nearly free.
+      const rawCmp = cpscRawComparable(r);
+      const changed =
+        (rawCmp.description ?? "") !== (existing.description ?? "") ||
+        (rawCmp.remedy ?? "") !== (existing.remedy ?? "");
+      if (!changed) continue;
 
       const normalized = await normalizeCpscRecall(r);
-      await insertRecallAndAlert(supabase, normalized, appUrl);
-      cpscNew += 1;
+      await applyAmendment(supabase, existing.id, normalized);
+      cpscAmended += 1;
     }
-  } catch {
-    // A source outage shouldn't block the other source's fetch below.
+    await recordFetchSuccess(supabase, "CPSC");
+  } catch (err) {
+    // A source outage shouldn't block the other sources below, and the
+    // failure is recorded (not swallowed) so the freshness watchdog can
+    // surface it.
+    await recordFetchFailure(supabase, "CPSC", err);
   }
 
+  // ── NHTSA ─────────────────────────────────────────────────────────────────
+  await recordFetchAttempt(supabase, "NHTSA");
   try {
-    // NHTSA has no bulk "recent recalls" feed — it's queried per
-    // make/model/year, so we look up each distinct vehicle combination
-    // already registered rather than a global feed.
+    // NHTSA has no bulk feed — queried per make/model/year, so we look up each
+    // distinct registered vehicle combination rather than a global feed.
     const { data: vehicles } = await supabase
       .from("products")
       .select("brand, model_number, purchase_date")
@@ -163,17 +263,27 @@ export async function GET(request: Request) {
       try {
         const raw = await fetchNhtsaRecalls(v.brand, v.model_number, year);
         for (const r of raw) {
+          const normalized = normalizeNhtsaRecall(r, v.model_number);
           const { data: existing } = await supabase
             .from("recalls")
-            .select("id")
+            .select("id, description, remedy, model_numbers")
             .eq("source", "NHTSA")
-            .eq("external_recall_id", r.NHTSACampaignNumber)
+            .eq("external_recall_id", normalized.external_recall_id)
             .maybeSingle();
-          if (existing) continue;
 
-          const normalized = normalizeNhtsaRecall(r, v.model_number);
-          await insertRecallAndAlert(supabase, normalized, appUrl);
-          nhtsaNew += 1;
+          if (!existing) {
+            if (await insertNewRecall(supabase, normalized, appUrl)) nhtsaNew += 1;
+            continue;
+          }
+
+          const changed =
+            (normalized.description ?? "") !== (existing.description ?? "") ||
+            (normalized.remedy ?? "") !== (existing.remedy ?? "") ||
+            !sameModels(normalized.model_numbers, existing.model_numbers);
+          if (!changed) continue;
+
+          await applyAmendment(supabase, existing.id, normalized);
+          nhtsaAmended += 1;
         }
       } catch {
         // One vehicle's lookup failing shouldn't block the others.
@@ -188,12 +298,117 @@ export async function GET(request: Request) {
         }
       } catch {
         // Product Intelligence is a bonus signal — a failure here shouldn't
-        // block recall matching, which is the safety-critical half of this job.
+        // block recall matching, the safety-critical half of this job.
       }
     }
-  } catch {
-    // best-effort
+    await recordFetchSuccess(supabase, "NHTSA");
+  } catch (err) {
+    await recordFetchFailure(supabase, "NHTSA", err);
   }
 
-  return NextResponse.json({ cpscFetched, cpscNew, nhtsaQueried, nhtsaNew, pidPatternsUpdated });
+  // ── FDA ───────────────────────────────────────────────────────────────────
+  // Covers three openFDA endpoints (food/drug/device) under one "FDA" bucket.
+  // A single center's outage shouldn't block the other two, but if all three
+  // fail the whole fetch is recorded as failed so the watchdog can see it.
+  await recordFetchAttempt(supabase, "FDA");
+  try {
+    const centerErrors: FdaEnforcementCenter[] = [];
+    for (const center of FDA_CENTERS) {
+      try {
+        const raw = await fetchFdaRecalls(center, daysAgoIso(7));
+        fdaFetched += raw.length;
+
+        for (const r of raw) {
+          const externalId = `${center}-${r.recall_number}`;
+          const { data: existing } = await supabase
+            .from("recalls")
+            .select("id, description")
+            .eq("source", "FDA")
+            .eq("external_recall_id", externalId)
+            .maybeSingle();
+
+          if (!existing) {
+            const normalized = await normalizeFdaRecall(r, center);
+            if (await insertNewRecall(supabase, normalized, appUrl)) fdaNew += 1;
+            continue;
+          }
+
+          // openFDA enforcement text is effectively immutable once published
+          // (unlike CPSC), so compare on description alone before paying for
+          // an AI extraction call on an amendment.
+          const rawDescription = [r.product_description, r.reason_for_recall].filter(Boolean).join(" — ");
+          if (rawDescription === (existing.description ?? "")) continue;
+
+          const normalized = await normalizeFdaRecall(r, center);
+          await applyAmendment(supabase, existing.id, normalized);
+          fdaAmended += 1;
+        }
+      } catch {
+        centerErrors.push(center);
+      }
+    }
+    if (centerErrors.length === FDA_CENTERS.length) {
+      throw new Error(`All FDA enforcement endpoints failed: ${centerErrors.join(", ")}`);
+    }
+    await recordFetchSuccess(supabase, "FDA");
+  } catch (err) {
+    await recordFetchFailure(supabase, "FDA", err);
+  }
+
+  // ── USDA (FSIS) ───────────────────────────────────────────────────────────
+  await recordFetchAttempt(supabase, "USDA");
+  try {
+    const raw = await fetchUsdaRecalls();
+    usdaFetched = raw.length;
+
+    for (const item of raw) {
+      const externalId = item.guid || item.link;
+      if (!externalId) continue;
+
+      const { data: existing } = await supabase
+        .from("recalls")
+        .select("id, description")
+        .eq("source", "USDA")
+        .eq("external_recall_id", externalId)
+        .maybeSingle();
+
+      if (!existing) {
+        const normalized = await normalizeUsdaRecall(item);
+        if (await insertNewRecall(supabase, normalized, appUrl)) usdaNew += 1;
+        continue;
+      }
+
+      const rawDescription = item.description || item.title || "";
+      if (rawDescription === (existing.description ?? "")) continue;
+
+      const normalized = await normalizeUsdaRecall(item);
+      await applyAmendment(supabase, existing.id, normalized);
+      usdaAmended += 1;
+    }
+    await recordFetchSuccess(supabase, "USDA");
+  } catch (err) {
+    await recordFetchFailure(supabase, "USDA", err);
+  }
+
+  // ── Freshness watchdog ────────────────────────────────────────────────────
+  // Runs after all sources so a source that's been failing for >36h alerts
+  // the owner even while the others keep succeeding.
+  const staleSources = await checkFreshnessAndAlert(supabase);
+
+  return NextResponse.json({
+    cpscFetched,
+    cpscNew,
+    cpscAmended,
+    nhtsaQueried,
+    nhtsaNew,
+    nhtsaAmended,
+    fdaFetched,
+    fdaNew,
+    fdaAmended,
+    usdaFetched,
+    usdaNew,
+    usdaAmended,
+    pidPatternsUpdated,
+    staleSources,
+  });
 }

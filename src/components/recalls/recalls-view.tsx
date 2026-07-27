@@ -30,7 +30,7 @@ export function RecallsView({
           <Image src="/brand/buddy-soft-happy.svg" alt="" width={28} height={35} />
           <div className="text-xs leading-relaxed text-teal">
             <span className="font-medium">No active recalls</span> on any of your{" "}
-            {productCount} product{productCount === 1 ? "" : "s"}. Buddy checks every day.
+            {productCount} product{productCount === 1 ? "" : "s"}. Buddy checks twice a day, automatically.
           </div>
         </div>
       ) : null}
@@ -40,9 +40,9 @@ export function RecallsView({
           <Image src="/brand/buddy-soft-happy.svg" alt="" width={56} height={69} />
           <div className="font-display text-base font-bold text-navy">No recalls yet</div>
           <p className="mx-auto max-w-xs text-xs leading-relaxed text-ink">
-            Buddy checks every day across CPSC and NHTSA. You&apos;ll see
-            anything that matches your products here, and get an email alert
-            the moment it happens.
+            Buddy checks twice a day across CPSC, NHTSA, FDA, and USDA,
+            automatically. Anything that matches your products will show up
+            here, with an email alert to follow.
           </p>
         </div>
       ) : (
@@ -82,9 +82,9 @@ export function RecallsView({
 
           <div className="mt-5 rounded-[10px] border border-border bg-white p-3.5 text-center">
             <p className="text-[11px] leading-relaxed text-ink">
-              Buddy checks for new recalls every day across CPSC and NHTSA.
-              You&apos;ll get an email alert the moment anything matches your
-              products.
+              Buddy checks for new recalls twice a day across CPSC, NHTSA,
+              FDA, and USDA, automatically. You&apos;ll get an email alert
+              when something matches your products.
             </p>
           </div>
         </>
