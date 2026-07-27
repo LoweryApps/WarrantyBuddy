@@ -74,13 +74,22 @@ async function matchAndAlert(
   // vs. a product's "Civic") — filter case-insensitively in JS instead.
   const { data: brandMatches } = await supabase
     .from("products")
-    .select("id, user_id, name, brand, model_number")
+    .select("id, user_id, name, brand, model_number, category")
     .ilike("brand", recall.brand);
 
   const normalizedRecallModels = recall.model_numbers.map((m) => m.toLowerCase());
-  const matches = (brandMatches ?? []).filter(
-    (p) => p.model_number && normalizedRecallModels.includes(p.model_number.toLowerCase()),
-  );
+  const matches = (brandMatches ?? []).filter((p) => {
+    if (p.model_number && normalizedRecallModels.includes(p.model_number.toLowerCase())) return true;
+    // NHTSA's model_numbers are the vehicle's model NAME (e.g. "F-150"), not a
+    // model_number field — vehicles are commonly registered with model_number
+    // left blank, so also match on the product's name for vehicle recalls.
+    // Scoped to NHTSA + category=Vehicle so a CPSC/FDA/USDA extracted model
+    // string can't coincidentally match an unrelated product's display name.
+    if (recall.source === "NHTSA" && p.category === "Vehicle" && p.name) {
+      return normalizedRecallModels.includes(p.name.toLowerCase());
+    }
+    return false;
+  });
 
   for (const product of matches) {
     const { data: alreadyAlerted } = await supabase
@@ -269,27 +278,33 @@ export async function GET(request: Request) {
   try {
     // NHTSA has no bulk feed — queried per make/model/year, so we look up each
     // distinct registered vehicle combination rather than a global feed.
+    // model_number is frequently left blank for vehicles (a car doesn't have
+    // one the way an appliance does) — name carries the model instead (e.g.
+    // "F-150"), and name is always present, so fall back to it. Prefer the
+    // dedicated model_year field over a purchase-date-derived year: the two
+    // can easily differ (e.g. bought used, or bought the same year as a new
+    // model year that hasn't shifted yet), and model_year is what NHTSA's API
+    // actually needs.
     const { data: vehicles } = await supabase
       .from("products")
-      .select("brand, model_number, purchase_date")
+      .select("brand, name, model_number, model_year, purchase_date")
       .eq("category", "Vehicle")
-      .not("brand", "is", null)
-      .not("model_number", "is", null)
-      .not("purchase_date", "is", null);
+      .not("brand", "is", null);
 
     const seen = new Set<string>();
     for (const v of vehicles ?? []) {
-      if (!v.brand || !v.model_number || !v.purchase_date) continue;
-      const year = v.purchase_date.slice(0, 4);
-      const key = `${v.brand.toLowerCase()}|${v.model_number.toLowerCase()}|${year}`;
+      const model = v.model_number || v.name;
+      const year = v.model_year ? String(v.model_year) : v.purchase_date?.slice(0, 4);
+      if (!v.brand || !model || !year) continue;
+      const key = `${v.brand.toLowerCase()}|${model.toLowerCase()}|${year}`;
       if (seen.has(key)) continue;
       seen.add(key);
       nhtsaQueried += 1;
 
       try {
-        const raw = await fetchNhtsaRecalls(v.brand, v.model_number, year);
+        const raw = await fetchNhtsaRecalls(v.brand, model, year);
         for (const r of raw) {
-          const normalized = normalizeNhtsaRecall(r, v.model_number);
+          const normalized = normalizeNhtsaRecall(r, model);
           const { data: existing } = await supabase
             .from("recalls")
             .select("id, description, remedy, model_numbers")
@@ -316,8 +331,8 @@ export async function GET(request: Request) {
       }
 
       try {
-        const complaints = await fetchNhtsaComplaints(v.brand, v.model_number, year);
-        const patterns = aggregateNhtsaComplaints(complaints, v.brand, v.model_number);
+        const complaints = await fetchNhtsaComplaints(v.brand, model, year);
+        const patterns = aggregateNhtsaComplaints(complaints, v.brand, model);
         for (const pattern of patterns) {
           await upsertProductIntelligence(supabase, { ...pattern, category: "Vehicle" });
           pidPatternsUpdated += 1;
