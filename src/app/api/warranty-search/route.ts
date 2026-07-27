@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { isPremium } from "@/lib/entitlements";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 import type { ProductCategory } from "@/lib/supabase/types";
 
 export const runtime = "nodejs";
+
+// Per-user cap on warranty web-searches — a web-search-enabled model call, so
+// pricier than a plain completion; low-frequency in normal use.
+const WARRANTY_SEARCH_LIMIT_PER_HOUR = 30;
 
 interface SearchableProduct {
   name: string;
@@ -82,6 +87,12 @@ export async function POST(request: Request) {
       { status: 402 },
     );
   }
+
+  const limited = await rateLimitResponse(
+    { key: `warranty-search:user:${user.id}`, limit: WARRANTY_SEARCH_LIMIT_PER_HOUR, windowSeconds: 3600 },
+    "You've run a lot of warranty searches — give it a minute and try again.",
+  );
+  if (limited) return limited;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {

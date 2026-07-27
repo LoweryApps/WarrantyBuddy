@@ -11,6 +11,7 @@ import {
 import { guessMediaType } from "@/lib/document-media-type";
 import { isPremium } from "@/lib/entitlements";
 import { bestPidMatches, PID_SOURCE_LABEL } from "@/lib/product-intelligence";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { downloadProductFile } from "@/lib/supabase/storage";
 import { createClient } from "@/lib/supabase/server";
 import type { ProductCategory } from "@/lib/supabase/types";
@@ -19,6 +20,9 @@ import { warrantyStatus } from "@/lib/warranty";
 export const runtime = "nodejs";
 
 const HISTORY_LIMIT = 20;
+// Per-user cap on chat turns — each turn is an LLM call that also attaches the
+// warranty document, so it's one of the priciest calls in the app.
+const ASK_BUDDY_LIMIT_PER_HOUR = 60;
 
 interface VaultProductRow {
   id: string;
@@ -157,6 +161,12 @@ export async function POST(request: Request) {
       { status: 402 },
     );
   }
+
+  const limited = await rateLimitResponse(
+    { key: `ask-buddy:user:${user.id}`, limit: ASK_BUDDY_LIMIT_PER_HOUR, windowSeconds: 3600 },
+    "You're chatting with Buddy very fast — give it a minute and try again.",
+  );
+  if (limited) return limited;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {

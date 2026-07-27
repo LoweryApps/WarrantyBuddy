@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { guessCategory } from "@/lib/products";
+
+// Per-user cap on the external barcode API (UPCitemdb has real per-call cost /
+// quota). Only cache MISSES count — a repeated scan served from cache is free.
+const BARCODE_LOOKUP_LIMIT_PER_HOUR = 60;
 
 interface UpcItemDbItem {
   brand?: string;
@@ -36,6 +41,13 @@ export async function POST(request: Request) {
   if (cached) {
     return NextResponse.json({ found: true, origin: "cache", ...cached });
   }
+
+  // Cache miss — this path makes a paid external call, so it's the one to cap.
+  const limited = await rateLimitResponse(
+    { key: `barcode-lookup:user:${user.id}`, limit: BARCODE_LOOKUP_LIMIT_PER_HOUR, windowSeconds: 3600 },
+    "You've scanned a lot of new barcodes — give it a minute and try again.",
+  );
+  if (limited) return limited;
 
   const apiKey = process.env.UPCITEMDB_API_KEY;
   const url = apiKey

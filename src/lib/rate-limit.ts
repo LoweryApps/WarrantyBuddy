@@ -1,8 +1,10 @@
+import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-// Shared rate limiting for the public, unauthenticated endpoints (SEO addendum
-// §7; pre-launch anti-abuse list). Vercel serverless has no shared memory, so
-// the counter lives in Postgres — see rate_limit_hit() in
+// Shared rate limiting for public endpoints AND the authenticated,
+// cost-bearing AI routes (each Anthropic call is real money, so a single
+// account can't be allowed to loop unbounded). Vercel serverless has no shared
+// memory, so the counter lives in Postgres — see rate_limit_hit() in
 // supabase/migrations/20260728000000_rate_limiting.sql. This module is the only
 // thing that calls it.
 
@@ -67,4 +69,20 @@ export function clientIp(headers: Headers): string {
     if (first) return first;
   }
   return headers.get("x-real-ip")?.trim() || "unknown";
+}
+
+// Convenience for a route: applies one rule and, if the caller is over the
+// limit, returns a ready-to-send 429 (with Retry-After); returns null when the
+// request is allowed to proceed. Keeps the per-user AI-route guards to a single
+// line each.
+export async function rateLimitResponse(
+  rule: RateLimitRule,
+  message = "You're doing that too fast — give it a minute and try again.",
+): Promise<NextResponse | null> {
+  const { allowed, retryAfterSeconds } = await rateLimit(rule);
+  if (allowed) return null;
+  return NextResponse.json(
+    { error: "rate_limited", message },
+    { status: 429, headers: { "Retry-After": String(retryAfterSeconds) } },
+  );
 }

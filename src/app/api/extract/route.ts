@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { isPremium } from "@/lib/entitlements";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
+
+// Per-user cap on AI extraction calls (label/receipt/warranty). Generous for
+// real interactive use, but stops a single account from looping the vision
+// model unbounded. label/receipt extraction is free-tier, so this is the only
+// volume guard on those.
+const EXTRACT_LIMIT_PER_HOUR = 40;
 
 const LABEL_PROMPT = `You are reading a photo of a product's identification label (the sticker usually found on the back or bottom of a physical product). Extract:
 - brand: the manufacturer/brand name
@@ -94,6 +101,12 @@ export async function POST(request: Request) {
       );
     }
   }
+
+  const limited = await rateLimitResponse(
+    { key: `extract:user:${user.id}`, limit: EXTRACT_LIMIT_PER_HOUR, windowSeconds: 3600 },
+    "You've scanned a lot in a short time — give it a minute and try again.",
+  );
+  if (limited) return limited;
 
   const bytes = Buffer.from(await file.arrayBuffer());
   const base64 = bytes.toString("base64");

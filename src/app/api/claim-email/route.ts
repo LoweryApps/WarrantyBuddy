@@ -8,10 +8,14 @@ import {
 import { guessMediaType } from "@/lib/document-media-type";
 import { isPremium } from "@/lib/entitlements";
 import { classifyUserReport, upsertProductIntelligence } from "@/lib/product-intelligence";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { downloadProductFile } from "@/lib/supabase/storage";
 import { createClient } from "@/lib/supabase/server";
 import type { ProductCategory } from "@/lib/supabase/types";
+
+// Per-user cap on AI claim-email drafts (a lower-frequency action than chat).
+const CLAIM_EMAIL_LIMIT_PER_HOUR = 20;
 
 // Best-effort: classifies the user's free-text issue description into an
 // anonymized failure-pattern record for the Product Intelligence Database
@@ -76,6 +80,12 @@ export async function POST(request: Request) {
       { status: 402 },
     );
   }
+
+  const limited = await rateLimitResponse(
+    { key: `claim-email:user:${user.id}`, limit: CLAIM_EMAIL_LIMIT_PER_HOUR, windowSeconds: 3600 },
+    "You've generated a lot of claim drafts — give it a minute and try again.",
+  );
+  if (limited) return limited;
 
   const { productId, issue } = await request.json();
   if (!productId || typeof issue !== "string" || !issue.trim()) {
