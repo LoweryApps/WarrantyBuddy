@@ -312,11 +312,25 @@ export async function POST(request: Request) {
     vaultSummary,
   });
 
+  // Attach the warranty document to the FIRST user turn (not the last) and mark
+  // it for prompt caching. Keeping the large document in a stable prefix
+  // position means every follow-up turn in the same conversation re-reads it
+  // from cache at ~0.1x instead of re-uploading the full base64 each turn — the
+  // single biggest cost lever on this route. Cache hits require the system
+  // prompt and this first turn to be byte-identical across turns; when they
+  // aren't (e.g. the vault summary changed), the cache simply misses and
+  // rewrites — no correctness impact.
+  const firstUserIdx = history.findIndex((m) => m.role === "user");
   const anthropicMessages: MessageParam[] = mergeConsecutiveRoles(
     history.map((m, i) => {
-      const isLast = i === history.length - 1;
-      if (isLast && m.role === "user" && documentBlock) {
-        return { role: "user", content: [documentBlock, { type: "text", text: m.content }] };
+      if (i === firstUserIdx && documentBlock) {
+        return {
+          role: "user",
+          content: [
+            { ...documentBlock, cache_control: { type: "ephemeral" } },
+            { type: "text", text: m.content },
+          ],
+        };
       }
       return { role: m.role, content: m.content };
     }),
@@ -327,7 +341,7 @@ export async function POST(request: Request) {
     const response = await client.messages.create({
       model: "claude-sonnet-5",
       max_tokens: 1024,
-      system: systemPrompt,
+      system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
       messages: anthropicMessages,
     });
 

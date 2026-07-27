@@ -224,7 +224,13 @@ Sign the email as: ${ctx.signatureName}`;
       messages: [
         {
           role: "user",
-          content: documentBlock ? [documentBlock, { type: "text", text: instructions }] : instructions,
+          // Cache the (large) warranty document: regenerating a draft for the
+          // same product re-reads it at ~0.1x instead of re-uploading the full
+          // base64. The document sits first, so the varying instructions/issue
+          // text after it don't affect the cached prefix.
+          content: documentBlock
+            ? [{ ...documentBlock, cache_control: { type: "ephemeral" } }, { type: "text", text: instructions }]
+            : instructions,
         },
       ],
     });
