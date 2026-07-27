@@ -24,8 +24,26 @@ import {
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
+// Vercel Hobby hard-caps every invocation at 300s with no override (confirmed
+// live — a first-time 30-day FDA backfill ran ~146 AI-extraction calls before
+// being killed mid-loop at the ~300s mark, silently: no exception, no
+// recordFetchFailure, just a dead invocation). Explicit here so raising it is
+// a one-line change if this project ever moves to Pro (up to 800s, or 1800s
+// on the extended-duration beta).
+export const maxDuration = 300;
 
 type AdminClient = ReturnType<typeof createAdminClient>;
+
+// Shared across CPSC/FDA/USDA below — each of their normalize functions makes
+// one sequential Claude call to extract brand/model from free text. A large
+// backlog (a first backfill, or catching up after several missed days) could
+// otherwise run long enough to hit the platform's duration limit above,
+// killing the invocation mid-run with no error recorded. Capping the total
+// AI-call count per invocation keeps runs comfortably inside that limit;
+// anything left over is simply not yet in `recalls`, so the next day's run
+// picks it up the same way a delayed run already does today (dedup on
+// (source, external_recall_id) makes deferring free, nothing is lost).
+const MAX_AI_CALLS_PER_RUN = 60;
 
 function daysAgoIso(days: number): string {
   const d = new Date();
@@ -190,6 +208,10 @@ export async function GET(request: Request) {
   let usdaNew = 0;
   let usdaAmended = 0;
   let pidPatternsUpdated = 0;
+  let aiCallsRemaining = MAX_AI_CALLS_PER_RUN;
+  let cpscBudgetExhausted = false;
+  let fdaBudgetExhausted = false;
+  let usdaBudgetExhausted = false;
 
   // ── CPSC ────────────────────────────────────────────────────────────────
   await recordFetchAttempt(supabase, "CPSC");
@@ -201,6 +223,11 @@ export async function GET(request: Request) {
     cpscFetched = raw.length;
 
     for (const r of raw) {
+      if (aiCallsRemaining <= 0) {
+        cpscBudgetExhausted = true;
+        break;
+      }
+
       const externalId = String(r.RecallID);
       const { data: existing } = await supabase
         .from("recalls")
@@ -211,6 +238,7 @@ export async function GET(request: Request) {
 
       if (!existing) {
         const normalized = await normalizeCpscRecall(r);
+        aiCallsRemaining -= 1;
         if (await insertNewRecall(supabase, normalized, appUrl)) cpscNew += 1;
         continue;
       }
@@ -224,6 +252,7 @@ export async function GET(request: Request) {
       if (!changed) continue;
 
       const normalized = await normalizeCpscRecall(r);
+      aiCallsRemaining -= 1;
       await applyAmendment(supabase, existing.id, normalized);
       cpscAmended += 1;
     }
@@ -323,6 +352,11 @@ export async function GET(request: Request) {
         fdaFetched += raw.length;
 
         for (const r of raw) {
+          if (aiCallsRemaining <= 0) {
+            fdaBudgetExhausted = true;
+            break;
+          }
+
           const externalId = `${center}-${r.recall_number}`;
           const { data: existing } = await supabase
             .from("recalls")
@@ -333,6 +367,7 @@ export async function GET(request: Request) {
 
           if (!existing) {
             const normalized = await normalizeFdaRecall(r, center);
+            aiCallsRemaining -= 1;
             if (await insertNewRecall(supabase, normalized, appUrl)) fdaNew += 1;
             continue;
           }
@@ -344,6 +379,7 @@ export async function GET(request: Request) {
           if (rawDescription === (existing.description ?? "")) continue;
 
           const normalized = await normalizeFdaRecall(r, center);
+          aiCallsRemaining -= 1;
           await applyAmendment(supabase, existing.id, normalized);
           fdaAmended += 1;
         }
@@ -366,6 +402,11 @@ export async function GET(request: Request) {
     usdaFetched = raw.length;
 
     for (const item of raw) {
+      if (aiCallsRemaining <= 0) {
+        usdaBudgetExhausted = true;
+        break;
+      }
+
       const externalId = item.guid || item.link;
       if (!externalId) continue;
 
@@ -378,6 +419,7 @@ export async function GET(request: Request) {
 
       if (!existing) {
         const normalized = await normalizeUsdaRecall(item);
+        aiCallsRemaining -= 1;
         if (await insertNewRecall(supabase, normalized, appUrl)) usdaNew += 1;
         continue;
       }
@@ -386,6 +428,7 @@ export async function GET(request: Request) {
       if (rawDescription === (existing.description ?? "")) continue;
 
       const normalized = await normalizeUsdaRecall(item);
+      aiCallsRemaining -= 1;
       await applyAmendment(supabase, existing.id, normalized);
       usdaAmended += 1;
     }
@@ -414,5 +457,9 @@ export async function GET(request: Request) {
     usdaAmended,
     pidPatternsUpdated,
     staleSources,
+    aiCallsRemaining,
+    cpscBudgetExhausted,
+    fdaBudgetExhausted,
+    usdaBudgetExhausted,
   });
 }
