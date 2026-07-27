@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { RecallCard } from "@/components/recalls/recall-card";
+import { RecallSearch } from "@/components/recalls/recall-search";
 import type { RecallAlertWithProduct } from "@/components/recalls/types";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +26,8 @@ export function RecallsView({
 
   return (
     <div className="mx-auto max-w-2xl p-4 pb-16">
+      <RecallSearch />
+
       {!isEmpty && active.length === 0 ? (
         <div className="mb-4 flex items-center gap-2.5 rounded-[10px] border border-teal/40 bg-teal/10 p-3">
           <Image src="/brand/buddy-soft-happy.svg" alt="" width={28} height={35} />

@@ -20,3 +20,14 @@ export interface RecallAlertWithProduct {
     category: ProductCategory;
   } | null;
 }
+
+export interface RecallSearchResult {
+  id: string;
+  source: RecallSource;
+  brand: string | null;
+  model_numbers: string[];
+  description: string | null;
+  remedy: string | null;
+  action_url: string | null;
+  recall_date: string | null;
+}
