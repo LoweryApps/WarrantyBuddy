@@ -33,6 +33,14 @@ export function PlanSection({
   const [portalLoading, setPortalLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // `premium` can be true without a real Stripe subscription during the
+  // closed beta (see BETA_ALL_FEATURES_UNLOCKED in entitlements.ts) — only a
+  // webhook-driven subscription_status means there's an actual subscription
+  // to manage. Without this check, beta users with no Stripe customer would
+  // see a "Manage subscription" button that 400s.
+  const hasRealSubscription = !!subscriptionStatus;
+  const betaUnlocked = premium && !hasRealSubscription;
+
   async function handleManage() {
     setPortalLoading(true);
     setError(null);
@@ -54,17 +62,19 @@ export function PlanSection({
       icon={premium ? Crown : Sparkles}
       iconTone={premium ? "teal" : "navy"}
       title="Plan"
-      subtitle={premium ? "You're on Premium" : "Free plan"}
+      subtitle={betaUnlocked ? "Beta — full access" : premium ? "You're on Premium" : "Free plan"}
     >
       <SettingsRow
-        label={plan ? PLAN_LABELS[plan] : "Free"}
+        label={betaUnlocked ? "All features unlocked" : plan ? PLAN_LABELS[plan] : "Free"}
         sublabel={
-          premium && subscriptionStatus
-            ? `${STATUS_LABEL[subscriptionStatus]}${currentPeriodEnd ? ` · renews ${new Date(currentPeriodEnd).toLocaleDateString()}` : ""}`
-            : "Up to 5 products, 3 receipts/month"
+          betaUnlocked
+            ? "Unlimited products & receipts for everyone during the closed beta"
+            : premium && subscriptionStatus
+              ? `${STATUS_LABEL[subscriptionStatus]}${currentPeriodEnd ? ` · renews ${new Date(currentPeriodEnd).toLocaleDateString()}` : ""}`
+              : "Up to 5 products, 3 receipts/month"
         }
       >
-        {premium ? (
+        {betaUnlocked ? null : premium ? (
           <Button
             disabled={portalLoading}
             onClick={handleManage}

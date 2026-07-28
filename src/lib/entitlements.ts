@@ -4,6 +4,13 @@ import type { Database, SubscriptionStatus } from "@/lib/supabase/types";
 export const FREE_PRODUCT_LIMIT = 5;
 export const FREE_RECEIPT_MONTHLY_LIMIT = 3;
 
+// Closed beta: every Premium-gated feature is unlocked for all users,
+// regardless of subscription status. Flip this back to `false` when the
+// beta ends and paid gating should resume — every limit in the app is
+// enforced via isPremium() (see the "!premium" call sites this file's
+// module comment lists), so this one flag is the single point of control.
+const BETA_ALL_FEATURES_UNLOCKED = true;
+
 const PREMIUM_STATUSES: SubscriptionStatus[] = ["active", "trialing"];
 
 export interface SubscriptionFields {
@@ -11,6 +18,7 @@ export interface SubscriptionFields {
 }
 
 export function isPremium(user: SubscriptionFields | null | undefined): boolean {
+  if (BETA_ALL_FEATURES_UNLOCKED) return true;
   return !!user?.subscription_status && PREMIUM_STATUSES.includes(user.subscription_status);
 }
 
