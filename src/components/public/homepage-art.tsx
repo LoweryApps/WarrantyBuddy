@@ -3,6 +3,8 @@
 // sample data since there's no logged-in user here) and a shared checkmark
 // icon for the pricing list.
 
+import Image from "next/image";
+
 export function CheckIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00A991" strokeWidth="2.5" className="mt-0.5 shrink-0">
@@ -16,17 +18,7 @@ export function HeroVault() {
     <div className="relative flex min-h-[340px] items-center justify-center md:min-h-[400px]">
       <div className="relative z-[2] w-full max-w-[340px] rounded-[22px] border border-white/10 bg-gradient-to-br from-[#1B2F52] to-[#132444] p-6 shadow-2xl">
         <div className="mb-5 flex items-center gap-3">
-          <svg width="30" height="35" viewBox="0 0 100 118" aria-hidden="true">
-            <path
-              d="M50 4 C63 11 79 15 93 15 C93 48 89 80 50 114 C11 80 7 48 7 15 C21 15 37 11 50 4 Z"
-              fill="#00C2A8"
-            />
-            <circle cx="36" cy="47" r="6.5" fill="#0F1F3D" />
-            <circle cx="38.2" cy="44.8" r="2" fill="#fff" />
-            <circle cx="64" cy="47" r="6.5" fill="#0F1F3D" />
-            <circle cx="66.2" cy="44.8" r="2" fill="#fff" />
-            <path d="M36 63 Q50 74 64 63" fill="none" stroke="#0F1F3D" strokeWidth="5" strokeLinecap="round" />
-          </svg>
+          <Image src="/brand/buddy-soft.svg" alt="" width={30} height={37} />
           <div>
             <div className="font-display text-[15px] font-semibold text-white">Your vault</div>
             <div className="text-xs text-[#8DA0BC]">8 products protected</div>
@@ -94,17 +86,7 @@ export function HeroVault() {
       </div>
 
       <div className="absolute right-0 bottom-11 z-[3] hidden w-[250px] items-start gap-2.5 rounded-2xl bg-white p-3.5 text-navy shadow-2xl sm:flex md:-right-3.5">
-        <svg width="30" height="34" viewBox="0 0 100 118" className="shrink-0" aria-hidden="true">
-          <path
-            d="M50 4 C63 11 79 15 93 15 C93 48 89 80 50 114 C11 80 7 48 7 15 C21 15 37 11 50 4 Z"
-            fill="#00C2A8"
-          />
-          <circle cx="36" cy="47" r="6.5" fill="#0F1F3D" />
-          <circle cx="38.2" cy="44.8" r="2" fill="#fff" />
-          <circle cx="64" cy="47" r="6.5" fill="#0F1F3D" />
-          <circle cx="66.2" cy="44.8" r="2" fill="#fff" />
-          <path d="M36 63 Q50 74 64 63" fill="none" stroke="#0F1F3D" strokeWidth="5" strokeLinecap="round" />
-        </svg>
+        <Image src="/brand/buddy-soft-alert.svg" alt="" width={30} height={37} className="shrink-0" />
         <div>
           <div className="text-[13px] leading-tight font-bold">Heads up — a product you own was recalled.</div>
           <div className="mt-0.5 text-xs text-ink">Tap to see the remedy →</div>

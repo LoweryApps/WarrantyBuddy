@@ -1,6 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
-import { BuddyFlat } from "@/components/public/buddy-flat";
 import { CheckIcon, HeroVault } from "@/components/public/homepage-art";
 
 export const metadata: Metadata = {
@@ -119,7 +119,7 @@ export default function HomePage() {
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-navy/95 backdrop-blur">
         <div className="mx-auto flex h-[66px] max-w-6xl items-center justify-between px-6">
           <Link href="#top" className="flex items-center gap-2.5 font-display text-xl font-bold text-white">
-            <BuddyFlat width={26} height={30} />
+            <Image src="/brand/buddy-soft.svg" alt="" width={26} height={32} />
             Warranty<span className="text-teal">Buddy</span>
           </Link>
           <div className="hidden items-center gap-8 md:flex">
@@ -366,7 +366,7 @@ export default function HomePage() {
       {/* FINAL CTA */}
       <section className="py-24 text-center">
         <div className="mx-auto max-w-6xl px-6">
-          <BuddyFlat width={64} height={75} className="mx-auto mb-6.5" />
+          <Image src="/brand/buddy-soft.svg" alt="" width={64} height={79} className="mx-auto mb-6.5" />
           <h2 className="mx-auto mb-4.5 max-w-2xl font-display text-3xl font-bold md:text-[42px]">
             The best time to organize a warranty is <span style={{ color: "#00A991" }}>before</span> you need it.
           </h2>
@@ -393,7 +393,7 @@ export default function HomePage() {
           <div className="grid gap-8 border-b border-white/10 pb-10 md:grid-cols-[1.4fr_1fr_1fr]">
             <div>
               <div className="mb-3.5 flex items-center gap-2.5 font-display text-xl font-bold text-white">
-                <BuddyFlat width={26} height={30} />
+                <Image src="/brand/buddy-soft.svg" alt="" width={26} height={32} />
                 Warranty<span className="text-teal">Buddy</span>
               </div>
               <p className="max-w-[260px] text-sm leading-relaxed">

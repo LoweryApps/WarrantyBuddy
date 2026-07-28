@@ -1,6 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
-import { BuddyFlat } from "@/components/public/buddy-flat";
 import { PublicRecallChecker } from "@/components/public/public-recall-checker";
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export default function RecallCheckPage() {
       <nav className="border-b border-white/10 bg-navy">
         <div className="mx-auto flex h-[66px] max-w-3xl items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2.5 font-display text-xl font-bold text-white">
-            <BuddyFlat width={24} height={28} />
+            <Image src="/brand/buddy-soft.svg" alt="" width={24} height={30} />
             Warranty<span className="text-teal">Buddy</span>
           </Link>
           <Link
