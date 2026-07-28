@@ -12,14 +12,14 @@ export default function RecallCheckPage() {
   return (
     <div className="flex min-h-full flex-col">
       <nav className="border-b border-white/10 bg-navy">
-        <div className="mx-auto flex h-[66px] max-w-3xl items-center justify-between px-6">
-          <Link href="/" className="flex items-center gap-2.5 font-display text-xl font-bold text-white">
-            <Image src="/brand/buddy-soft.svg" alt="" width={24} height={30} />
+        <div className="mx-auto flex h-[66px] max-w-3xl items-center justify-between gap-3 px-4 sm:px-6">
+          <Link href="/" className="flex shrink-0 items-center gap-2 font-display text-base font-bold text-white sm:gap-2.5 sm:text-xl">
+            <Image src="/brand/buddy-soft.svg" alt="" width={20} height={25} className="sm:h-[30px] sm:w-6" />
             <span>Warranty<span className="text-teal">Buddy</span></span>
           </Link>
           <Link
             href="/sign-up"
-            className="rounded-lg bg-teal px-4 py-2 font-display text-sm font-bold text-navy hover:opacity-90"
+            className="whitespace-nowrap rounded-lg bg-teal px-3 py-1.5 font-display text-xs font-bold text-navy hover:opacity-90 sm:px-4 sm:py-2 sm:text-sm"
           >
             Protect my products
           </Link>

@@ -202,19 +202,19 @@ export default function HomePage() {
               Recall checker
             </a>
           </div>
-          <div className="flex items-center gap-3.5">
+          <div className="flex items-center gap-2 sm:gap-3.5">
             <Link
               href="/login"
-              className="hidden rounded-[10px] border border-white/20 px-4.5 py-2.5 text-sm font-bold text-white hover:border-white hover:bg-white/5 sm:inline-flex"
+              className="inline-flex rounded-[10px] border border-white/20 px-3 py-2 text-xs font-bold text-white hover:border-white hover:bg-white/5 sm:px-4.5 sm:py-2.5 sm:text-sm"
             >
               Log in
             </Link>
-            <a
-              href="#how"
-              className="inline-flex items-center gap-2 rounded-[10px] bg-teal px-4.5 py-2.5 text-sm font-bold text-navy hover:bg-teal/90"
+            <Link
+              href="/sign-up"
+              className="inline-flex items-center gap-2 rounded-[10px] bg-teal px-3 py-2 text-xs font-bold text-navy hover:bg-teal/90 sm:px-4.5 sm:py-2.5 sm:text-sm"
             >
-              See how it works
-            </a>
+              Sign up
+            </Link>
           </div>
         </div>
       </nav>

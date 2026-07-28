@@ -20,12 +20,12 @@ export default function AuthLayout({
       }}
     >
       <nav className="border-b border-white/10">
-        <div className="mx-auto flex h-[66px] max-w-6xl items-center justify-between px-6">
-          <Link href="/" className="flex items-center gap-2.5 font-display text-xl font-bold text-white">
-            <Image src="/brand/buddy-soft.svg" alt="" width={24} height={30} />
+        <div className="mx-auto flex h-[66px] max-w-6xl items-center justify-between px-4 sm:px-6">
+          <Link href="/" className="flex items-center gap-2 font-display text-base font-bold text-white sm:gap-2.5 sm:text-xl">
+            <Image src="/brand/buddy-soft.svg" alt="" width={20} height={25} className="sm:h-[30px] sm:w-6" />
             <span>Warranty<span className="text-teal">Buddy</span></span>
           </Link>
-          <div className="hidden items-center gap-8 sm:flex">
+          <div className="hidden items-center gap-8 lg:flex">
             <Link href="/#features" className="text-sm font-medium text-[#C3CEDE] hover:text-white">
               Features
             </Link>
@@ -36,16 +36,16 @@ export default function AuthLayout({
               Recall checker
             </Link>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/login"
-              className="rounded-[10px] border border-white/20 px-4 py-2 text-sm font-bold text-white hover:border-white hover:bg-white/5"
+              className="whitespace-nowrap rounded-[10px] border border-white/20 px-2.5 py-1.5 text-xs font-bold text-white hover:border-white hover:bg-white/5 sm:px-4 sm:py-2 sm:text-sm"
             >
               Log in
             </Link>
             <Link
               href="/sign-up"
-              className="rounded-[10px] bg-teal px-4 py-2 text-sm font-bold text-navy hover:bg-teal/90"
+              className="whitespace-nowrap rounded-[10px] bg-teal px-2.5 py-1.5 text-xs font-bold text-navy hover:bg-teal/90 sm:px-4 sm:py-2 sm:text-sm"
             >
               Sign up
             </Link>
