@@ -15,7 +15,7 @@ export default function RecallCheckPage() {
         <div className="mx-auto flex h-[66px] max-w-3xl items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2.5 font-display text-xl font-bold text-white">
             <Image src="/brand/buddy-soft.svg" alt="" width={24} height={30} />
-            Warranty<span className="text-teal">Buddy</span>
+            <span>Warranty<span className="text-teal">Buddy</span></span>
           </Link>
           <Link
             href="/sign-up"

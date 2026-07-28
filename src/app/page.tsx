@@ -186,7 +186,7 @@ export default function HomePage() {
         <div className="mx-auto flex h-[66px] max-w-6xl items-center justify-between px-6">
           <Link href="#top" className="flex items-center gap-2.5 font-display text-xl font-bold text-white">
             <Image src="/brand/buddy-soft.svg" alt="" width={26} height={32} />
-            Warranty<span className="text-teal">Buddy</span>
+            <span>Warranty<span className="text-teal">Buddy</span></span>
           </Link>
           <div className="hidden items-center gap-8 md:flex">
             <a href="#how" className="text-sm font-medium text-[#C3CEDE] hover:text-white">
@@ -493,7 +493,7 @@ export default function HomePage() {
             <div>
               <div className="mb-3.5 flex items-center gap-2.5 font-display text-xl font-bold text-white">
                 <Image src="/brand/buddy-soft.svg" alt="" width={26} height={32} />
-                Warranty<span className="text-teal">Buddy</span>
+                <span>Warranty<span className="text-teal">Buddy</span></span>
               </div>
               <p className="max-w-[260px] text-sm leading-relaxed">
                 The friendly shield who reads the fine print, tracks your coverage, and files the claim — so you don&apos;t have to.
