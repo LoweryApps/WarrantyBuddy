@@ -17,6 +17,10 @@ const PUBLIC_PATHS = [
   "/privacy",
   // Public recall-digest signup (anonymous, double opt-in) — not app users.
   "/api/recall-subscribe",
+  // Public, no-login recall checker on the marketing site (brand/model
+  // search only) — and its API route.
+  "/recall-check",
+  "/api/recall-check",
   // Crawler-facing generated files — must be reachable without a session.
   "/robots.txt",
   "/sitemap.xml",
@@ -60,9 +64,11 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isPublicPath = PUBLIC_PATHS.some((path) =>
-    request.nextUrl.pathname.startsWith(path),
-  );
+  // Exact match, not startsWith: every pathname begins with "/", so treating
+  // it as a prefix would make the whole app public.
+  const isRoot = request.nextUrl.pathname === "/";
+  const isPublicPath =
+    isRoot || PUBLIC_PATHS.some((path) => request.nextUrl.pathname.startsWith(path));
 
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();
