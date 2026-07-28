@@ -274,6 +274,35 @@ export default function HomePage() {
               <span style={{ color: "#00A991" }}>you&apos;re already ready.</span>
             </p>
           </div>
+
+          <div className="mt-14 grid gap-6 md:grid-cols-2">
+            <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+              <video
+                src="/demo/recall-checker-demo.mp4"
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full"
+              />
+              <div className="border-t border-border p-4 text-center text-sm font-semibold text-navy">
+                See the free recall checker in action
+              </div>
+            </div>
+            <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+              <video
+                src="/demo/dashboard-demo.mp4"
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full"
+              />
+              <div className="border-t border-border p-4 text-center text-sm font-semibold text-navy">
+                See your vault, warranty, and claim-readiness score
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
