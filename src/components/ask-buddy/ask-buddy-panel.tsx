@@ -261,6 +261,15 @@ export function AskBuddyPanel(props: AskBuddyPanelProps) {
 // message stays plain text, so no general markdown library is needed.
 const MARKDOWN_LINK = /\[([^\]]+)\]\(([^)]+)\)/g;
 
+// The system prompt's instruction to only link the three patterns below is a
+// convention, not something the model is structurally bound by — content the
+// model reads and echoes (a document, a forwarded email, product intelligence
+// text) could in principle contain something that looks like a markdown link
+// with an attacker-chosen destination. Enforce the same three patterns in
+// code rather than trusting the prompt alone: anything else renders as plain
+// text (the literal "[label](href)"), never as a clickable anchor.
+const ALLOWED_HREF = /^\/products\/[^/?]+(?:\?tab=(?:warranty|documents))?$/;
+
 function renderMessageContent(content: string): React.ReactNode[] {
   const nodes: React.ReactNode[] = [];
   let lastIndex = 0;
@@ -272,12 +281,16 @@ function renderMessageContent(content: string): React.ReactNode[] {
     if (match.index > lastIndex) {
       nodes.push(content.slice(lastIndex, match.index));
     }
-    const [, label, href] = match;
-    nodes.push(
-      <Link key={`link-${key++}`} href={href} className="font-medium text-teal underline underline-offset-2">
-        {label}
-      </Link>,
-    );
+    const [full, label, href] = match;
+    if (ALLOWED_HREF.test(href)) {
+      nodes.push(
+        <Link key={`link-${key++}`} href={href} className="font-medium text-teal underline underline-offset-2">
+          {label}
+        </Link>,
+      );
+    } else {
+      nodes.push(full);
+    }
     lastIndex = match.index + match[0].length;
   }
   if (lastIndex < content.length) {
