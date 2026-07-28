@@ -426,7 +426,15 @@ export default function HomePage() {
             </div>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3 pt-5 text-[13px]">
-            <span>© {new Date().getFullYear()} WarrantyBuddy · mywarrantybuddy.com</span>
+            <span className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+              <span>© {new Date().getFullYear()} WarrantyBuddy · mywarrantybuddy.com</span>
+              <Link href="/privacy" className="hover:text-white">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="hover:text-white">
+                Terms of Service
+              </Link>
+            </span>
             <span className="max-w-[640px] leading-relaxed">
               Recall data is sourced from public U.S. government agencies and provided for convenience. WarrantyBuddy checks these
               sources once daily but does not guarantee every recall is captured, and is not a substitute for official government

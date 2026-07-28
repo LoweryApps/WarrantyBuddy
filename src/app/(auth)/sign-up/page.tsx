@@ -117,8 +117,14 @@ export default function SignUpPage() {
             className="mt-0.5 border-border data-checked:border-teal data-checked:bg-teal data-checked:text-navy"
           />
           <Label htmlFor="agree" className="text-[11px] font-normal leading-relaxed text-ink">
-            I agree to the <span className="text-teal">Terms of Service</span> and{" "}
-            <span className="text-teal">Privacy Policy</span>
+            I agree to the{" "}
+            <Link href="/terms" target="_blank" className="text-teal underline underline-offset-2">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" target="_blank" className="text-teal underline underline-offset-2">
+              Privacy Policy
+            </Link>
           </Label>
         </div>
 
