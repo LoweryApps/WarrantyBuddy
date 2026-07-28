@@ -30,6 +30,72 @@ const FEATURES = [
   },
 ];
 
+const SECURITY_POINTS = [
+  {
+    title: "Your data, isolated",
+    body: "Every product, warranty, and document is scoped to your account alone — enforced at the database level, not just in the app's UI.",
+    icon: (
+      <>
+        <rect x="3" y="11" width="18" height="10" rx="2" />
+        <path d="M7 11V7a5 5 0 0110 0v4" />
+      </>
+    ),
+  },
+  {
+    title: "Encrypted everywhere",
+    body: "All traffic to and from WarrantyBuddy is encrypted, and your uploaded photos and documents live in private storage — never public.",
+    icon: (
+      <>
+        <path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z" />
+        <path d="M9 12l2 2 4-4" />
+      </>
+    ),
+  },
+  {
+    title: "Payments via Stripe",
+    body: "Billing is handled entirely by Stripe. We never see or store your full card number.",
+    icon: (
+      <>
+        <rect x="2" y="5" width="20" height="14" rx="2" />
+        <path d="M2 10h20" />
+      </>
+    ),
+  },
+  {
+    title: "AI used narrowly",
+    body: "A photo or question is sent only to power the specific feature you're using — not shared beyond that, and not used to train AI models.",
+    icon: (
+      <>
+        <rect x="4" y="8" width="16" height="12" rx="2" />
+        <path d="M9 8V5a3 3 0 016 0v3" />
+        <circle cx="9" cy="14" r="1" />
+        <circle cx="15" cy="14" r="1" />
+      </>
+    ),
+  },
+  {
+    title: "You're in control",
+    body: "Delete your account anytime and everything — products, documents, chat history — is permanently removed.",
+    icon: (
+      <>
+        <path d="M4 7h16" />
+        <path d="M9 7V4h6v3" />
+        <path d="M6 7l1 13h10l1-13" />
+      </>
+    ),
+  },
+  {
+    title: "Built to fail safe",
+    body: "Every request is authenticated before it can touch your data, and sensitive actions are rate-limited against abuse.",
+    icon: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 2" />
+      </>
+    ),
+  },
+];
+
 const STEPS = [
   {
     n: 1,
@@ -247,6 +313,39 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* SECURITY */}
+      <section id="security" className="py-20 md:py-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="mx-auto mb-14 max-w-xl text-center">
+            <div className="mb-3.5 font-display text-[13px] font-semibold tracking-widest uppercase" style={{ color: "#00A991" }}>
+              Security &amp; privacy
+            </div>
+            <h2 className="mb-4 font-display text-3xl font-bold md:text-[38px]">Your warranties. Your data. Nobody else's.</h2>
+            <p className="text-lg text-ink">
+              WarrantyBuddy holds real receipts, warranty documents, and product photos — here&apos;s how that&apos;s protected.
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-3">
+            {SECURITY_POINTS.map((p) => (
+              <div key={p.title} className="rounded-2xl border border-border bg-white p-7.5">
+                <div className="mb-5 flex h-13 w-13 items-center justify-center rounded-[13px] bg-teal/10">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00A991" strokeWidth="2">
+                    {p.icon}
+                  </svg>
+                </div>
+                <h3 className="mb-2.5 font-display text-xl font-semibold">{p.title}</h3>
+                <p className="text-[15px] leading-relaxed text-ink">{p.body}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-8 text-center text-sm text-ink">
+            <Link href="/privacy" className="font-semibold text-teal underline underline-offset-2">
+              Read our full Privacy Policy
+            </Link>
+          </p>
+        </div>
+      </section>
+
       {/* HOW IT WORKS */}
       <section id="how" className="bg-cloud py-20 md:py-24">
         <div className="mx-auto max-w-6xl px-6">
@@ -410,6 +509,9 @@ export default function HomePage() {
               </a>
               <a href="#pricing" className="mb-2.5 block text-sm hover:text-white">
                 Pricing
+              </a>
+              <a href="#security" className="mb-2.5 block text-sm hover:text-white">
+                Security
               </a>
               <Link href="/recall-check" className="mb-2.5 block text-sm hover:text-white">
                 Recall checker
