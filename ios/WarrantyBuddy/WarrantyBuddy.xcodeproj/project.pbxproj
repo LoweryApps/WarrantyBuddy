@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		0C4B2F219B08B8367834EFAD /* ProductDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E012C4AAAEA4AA0A3A634737 /* ProductDetailView.swift */; };
 		1B806728E7A9085BF1AA8C00 /* AuthGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E147848982B15917349764A /* AuthGate.swift */; };
+		1B9586C6CCC7CCCCEF14C5FE /* ProductFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD12FE282E2A6278EC5FBD89 /* ProductFormView.swift */; };
+		26763B813723151AA5A37F68 /* PhotoCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9B60CA8F04F2C786AF5F23 /* PhotoCaptureView.swift */; };
+		41012737F6A03A78CF005BB0 /* AddProductView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C94530A139A88BE6D69B99 /* AddProductView.swift */; };
 		5644D0146CF72F2AB2E5DFA9 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209AF14E50F0E88E32BECA71 /* Config.swift */; };
 		5B02E8769A5D5856CD8D7DC2 /* ProductWithWarranties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207C3C0DC2A2D62BBF96E42E /* ProductWithWarranties.swift */; };
 		67E7B09B565161380CAADADA /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C041FD1740009BE7B2B95DF /* SessionStore.swift */; };
@@ -20,7 +23,9 @@
 		9678342EF9C9E2D6BBE2BAF5 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B14DA79C412C4E4ECF02E9DF /* SignUpView.swift */; };
 		B04A0739FBDB3B5D13A272EE /* ClaimReadiness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352650403301A44DDD7CC8F7 /* ClaimReadiness.swift */; };
 		B14624D5B72D8BF423565031 /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678E76E3913152C9B25EB946 /* SupabaseService.swift */; };
+		D557420C320C571D4061F22C /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1E9EBB84174254ADAE130A /* APIClient.swift */; };
 		D7ECB17777AA0A53DF05957D /* VaultListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17266FDFA1A9DDA735F40BED /* VaultListView.swift */; };
+		E5FB735CD5E8470E6D7DFF53 /* ProductDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84AA383CF1A34EAEAA7FED63 /* ProductDraft.swift */; };
 		EB047D4404537C60C1C20BDE /* WarrantyBuddyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB27B3114AE83D31C1CED90C /* WarrantyBuddyApp.swift */; };
 /* End PBXBuildFile section */
 
@@ -32,12 +37,17 @@
 		6161FEC6A72793078AB87B22 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		678E76E3913152C9B25EB946 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
 		6E147848982B15917349764A /* AuthGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthGate.swift; sourceTree = "<group>"; };
+		84AA383CF1A34EAEAA7FED63 /* ProductDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDraft.swift; sourceTree = "<group>"; };
+		8B9B60CA8F04F2C786AF5F23 /* PhotoCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCaptureView.swift; sourceTree = "<group>"; };
 		8C041FD1740009BE7B2B95DF /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
 		9BECF05D64C0413A1895826C /* WarrantyBuddy.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = WarrantyBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF1E9EBB84174254ADAE130A /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		B14DA79C412C4E4ECF02E9DF /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		BE783B83190C429DE1DA06FF /* Warranty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Warranty.swift; sourceTree = "<group>"; };
+		C8C94530A139A88BE6D69B99 /* AddProductView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProductView.swift; sourceTree = "<group>"; };
 		C8E985AFF655AED2EEAAD90E /* Product.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Product.swift; sourceTree = "<group>"; };
 		CB4595A2C5C984922747E6DA /* ForgotPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordView.swift; sourceTree = "<group>"; };
+		CD12FE282E2A6278EC5FBD89 /* ProductFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductFormView.swift; sourceTree = "<group>"; };
 		E012C4AAAEA4AA0A3A634737 /* ProductDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailView.swift; sourceTree = "<group>"; };
 		EB27B3114AE83D31C1CED90C /* WarrantyBuddyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarrantyBuddyApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -57,6 +67,7 @@
 		00B678B6B8BB169D73E6536F /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				B5606D8DC20D6CE6F4F53E6D /* AddProduct */,
 				9296A0E0387BECE2158A1C93 /* Auth */,
 				A7EA71B3FC0AF9B2173247A7 /* Vault */,
 			);
@@ -104,10 +115,21 @@
 		AC1E27EB0517026CCD9A57B9 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				AF1E9EBB84174254ADAE130A /* APIClient.swift */,
 				8C041FD1740009BE7B2B95DF /* SessionStore.swift */,
 				678E76E3913152C9B25EB946 /* SupabaseService.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		B5606D8DC20D6CE6F4F53E6D /* AddProduct */ = {
+			isa = PBXGroup;
+			children = (
+				C8C94530A139A88BE6D69B99 /* AddProductView.swift */,
+				8B9B60CA8F04F2C786AF5F23 /* PhotoCaptureView.swift */,
+				CD12FE282E2A6278EC5FBD89 /* ProductFormView.swift */,
+			);
+			path = AddProduct;
 			sourceTree = "<group>";
 		};
 		C88341E9E5B5CE3F2FB9F67E = {
@@ -123,6 +145,7 @@
 			children = (
 				352650403301A44DDD7CC8F7 /* ClaimReadiness.swift */,
 				C8E985AFF655AED2EEAAD90E /* Product.swift */,
+				84AA383CF1A34EAEAA7FED63 /* ProductDraft.swift */,
 				207C3C0DC2A2D62BBF96E42E /* ProductWithWarranties.swift */,
 				BE783B83190C429DE1DA06FF /* Warranty.swift */,
 			);
@@ -199,13 +222,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D557420C320C571D4061F22C /* APIClient.swift in Sources */,
+				41012737F6A03A78CF005BB0 /* AddProductView.swift in Sources */,
 				1B806728E7A9085BF1AA8C00 /* AuthGate.swift in Sources */,
 				B04A0739FBDB3B5D13A272EE /* ClaimReadiness.swift in Sources */,
 				5644D0146CF72F2AB2E5DFA9 /* Config.swift in Sources */,
 				85D47E04F1EAE4C5A75DD411 /* ForgotPasswordView.swift in Sources */,
 				766E92BF3BB280725EBE2026 /* LoginView.swift in Sources */,
+				26763B813723151AA5A37F68 /* PhotoCaptureView.swift in Sources */,
 				7320BAC181684BD42101B2DD /* Product.swift in Sources */,
 				0C4B2F219B08B8367834EFAD /* ProductDetailView.swift in Sources */,
+				E5FB735CD5E8470E6D7DFF53 /* ProductDraft.swift in Sources */,
+				1B9586C6CCC7CCCCEF14C5FE /* ProductFormView.swift in Sources */,
 				5B02E8769A5D5856CD8D7DC2 /* ProductWithWarranties.swift in Sources */,
 				67E7B09B565161380CAADADA /* SessionStore.swift in Sources */,
 				9678342EF9C9E2D6BBE2BAF5 /* SignUpView.swift in Sources */,
@@ -284,6 +312,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = WarrantyBuddy;
+				INFOPLIST_KEY_NSCameraUsageDescription = "WarrantyBuddy uses your camera to scan product labels and receipts so Buddy can fill in the details for you.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "WarrantyBuddy can read a product label or receipt photo from your library.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -307,6 +337,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = WarrantyBuddy;
+				INFOPLIST_KEY_NSCameraUsageDescription = "WarrantyBuddy uses your camera to scan product labels and receipts so Buddy can fill in the details for you.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "WarrantyBuddy can read a product label or receipt photo from your library.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (

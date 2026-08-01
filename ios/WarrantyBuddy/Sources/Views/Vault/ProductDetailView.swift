@@ -2,6 +2,11 @@ import SwiftUI
 
 struct ProductDetailView: View {
     let item: ProductWithWarranties
+    var onChanged: () -> Void = {}
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var showingEdit = false
+    @State private var showingDeleteConfirm = false
 
     private var readiness: ClaimReadinessResult {
         ClaimReadiness.compute(
@@ -55,9 +60,41 @@ struct ProductDetailView: View {
                     }
                 }
             }
+
+            Section {
+                Button("Delete product", role: .destructive) {
+                    showingDeleteConfirm = true
+                }
+            }
         }
         .navigationTitle(item.name)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Edit") { showingEdit = true }
+            }
+        }
+        .sheet(isPresented: $showingEdit) {
+            NavigationStack {
+                ProductFormView(mode: .edit(productId: item.id), initialDraft: .from(item.product)) {
+                    showingEdit = false
+                    onChanged()
+                    dismiss()
+                }
+            }
+        }
+        .confirmationDialog("Delete this product?", isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                Task { await deleteProduct() }
+            }
+            Button("Cancel", role: .cancel) {}
+        }
+    }
+
+    private func deleteProduct() async {
+        try? await SupabaseService.client.from("products").delete().eq("id", value: item.id).execute()
+        onChanged()
+        dismiss()
     }
 
     @ViewBuilder

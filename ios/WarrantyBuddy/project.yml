@@ -28,3 +28,5 @@ targets:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         ENABLE_PREVIEWS: YES
+        INFOPLIST_KEY_NSCameraUsageDescription: "WarrantyBuddy uses your camera to scan product labels and receipts so Buddy can fill in the details for you."
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "WarrantyBuddy can read a product label or receipt photo from your library."

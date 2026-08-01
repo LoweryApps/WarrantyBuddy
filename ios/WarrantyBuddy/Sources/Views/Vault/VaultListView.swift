@@ -5,6 +5,7 @@ struct VaultListView: View {
     @State private var products: [ProductWithWarranties] = []
     @State private var isLoading = true
     @State private var errorMessage: String?
+    @State private var showingAdd = false
 
     var body: some View {
         NavigationStack {
@@ -14,28 +15,51 @@ struct VaultListView: View {
                 } else if let errorMessage {
                     ContentUnavailableView("Couldn't load your vault", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
                 } else if products.isEmpty {
-                    ContentUnavailableView("No products yet", systemImage: "shield", description: Text("Products you add on the web will show up here."))
+                    ContentUnavailableView("No products yet", systemImage: "shield", description: Text("Tap + to add your first product."))
                 } else {
-                    List(products) { item in
-                        NavigationLink(value: item) {
-                            VaultRow(item: item)
+                    List {
+                        ForEach(products) { item in
+                            NavigationLink(value: item) {
+                                VaultRow(item: item)
+                            }
+                        }
+                        .onDelete { offsets in
+                            Task { await delete(at: offsets) }
                         }
                     }
                     .navigationDestination(for: ProductWithWarranties.self) { item in
-                        ProductDetailView(item: item)
+                        ProductDetailView(item: item, onChanged: { Task { await load() } })
                     }
                 }
             }
             .navigationTitle("Your vault")
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .topBarLeading) {
                     Button("Sign out") {
                         Task { try? await SupabaseService.client.auth.signOut() }
                     }
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showingAdd = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                }
+            }
+            .sheet(isPresented: $showingAdd) {
+                AddProductView { Task { await load() } }
             }
             .task { await load() }
             .refreshable { await load() }
+        }
+    }
+
+    private func delete(at offsets: IndexSet) async {
+        let idsToDelete = offsets.map { products[$0].id }
+        products.remove(atOffsets: offsets)
+        for id in idsToDelete {
+            try? await SupabaseService.client.from("products").delete().eq("id", value: id).execute()
         }
     }
 
