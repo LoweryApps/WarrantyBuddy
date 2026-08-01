@@ -1,0 +1,430 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0C4B2F219B08B8367834EFAD /* ProductDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E012C4AAAEA4AA0A3A634737 /* ProductDetailView.swift */; };
+		1B806728E7A9085BF1AA8C00 /* AuthGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E147848982B15917349764A /* AuthGate.swift */; };
+		5644D0146CF72F2AB2E5DFA9 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209AF14E50F0E88E32BECA71 /* Config.swift */; };
+		5B02E8769A5D5856CD8D7DC2 /* ProductWithWarranties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207C3C0DC2A2D62BBF96E42E /* ProductWithWarranties.swift */; };
+		67E7B09B565161380CAADADA /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C041FD1740009BE7B2B95DF /* SessionStore.swift */; };
+		7320BAC181684BD42101B2DD /* Product.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E985AFF655AED2EEAAD90E /* Product.swift */; };
+		766E92BF3BB280725EBE2026 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6161FEC6A72793078AB87B22 /* LoginView.swift */; };
+		7D8E7708122E70C91991766B /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 6027CB0D6C0D2B5FE966D38D /* Supabase */; };
+		85D47E04F1EAE4C5A75DD411 /* ForgotPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4595A2C5C984922747E6DA /* ForgotPasswordView.swift */; };
+		8A9B7B72CA19B6A5AAD3DD09 /* Warranty.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE783B83190C429DE1DA06FF /* Warranty.swift */; };
+		9678342EF9C9E2D6BBE2BAF5 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B14DA79C412C4E4ECF02E9DF /* SignUpView.swift */; };
+		B04A0739FBDB3B5D13A272EE /* ClaimReadiness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352650403301A44DDD7CC8F7 /* ClaimReadiness.swift */; };
+		B14624D5B72D8BF423565031 /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678E76E3913152C9B25EB946 /* SupabaseService.swift */; };
+		D7ECB17777AA0A53DF05957D /* VaultListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17266FDFA1A9DDA735F40BED /* VaultListView.swift */; };
+		EB047D4404537C60C1C20BDE /* WarrantyBuddyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB27B3114AE83D31C1CED90C /* WarrantyBuddyApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		17266FDFA1A9DDA735F40BED /* VaultListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultListView.swift; sourceTree = "<group>"; };
+		207C3C0DC2A2D62BBF96E42E /* ProductWithWarranties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductWithWarranties.swift; sourceTree = "<group>"; };
+		209AF14E50F0E88E32BECA71 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		352650403301A44DDD7CC8F7 /* ClaimReadiness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimReadiness.swift; sourceTree = "<group>"; };
+		6161FEC6A72793078AB87B22 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		678E76E3913152C9B25EB946 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
+		6E147848982B15917349764A /* AuthGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthGate.swift; sourceTree = "<group>"; };
+		8C041FD1740009BE7B2B95DF /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
+		9BECF05D64C0413A1895826C /* WarrantyBuddy.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = WarrantyBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B14DA79C412C4E4ECF02E9DF /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		BE783B83190C429DE1DA06FF /* Warranty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Warranty.swift; sourceTree = "<group>"; };
+		C8E985AFF655AED2EEAAD90E /* Product.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Product.swift; sourceTree = "<group>"; };
+		CB4595A2C5C984922747E6DA /* ForgotPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordView.swift; sourceTree = "<group>"; };
+		E012C4AAAEA4AA0A3A634737 /* ProductDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailView.swift; sourceTree = "<group>"; };
+		EB27B3114AE83D31C1CED90C /* WarrantyBuddyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarrantyBuddyApp.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		29F8821C356692528263CB18 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7D8E7708122E70C91991766B /* Supabase in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		00B678B6B8BB169D73E6536F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				9296A0E0387BECE2158A1C93 /* Auth */,
+				A7EA71B3FC0AF9B2173247A7 /* Vault */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		3A40B702361A8EFE3D1ADFA7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9BECF05D64C0413A1895826C /* WarrantyBuddy.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9296A0E0387BECE2158A1C93 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				CB4595A2C5C984922747E6DA /* ForgotPasswordView.swift */,
+				6161FEC6A72793078AB87B22 /* LoginView.swift */,
+				B14DA79C412C4E4ECF02E9DF /* SignUpView.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		977B1E93B97A9EC4EBDB4710 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				FBC0786A3C36FC0012A269E9 /* App */,
+				FA60479ABE3C41C0CD133A62 /* Models */,
+				AC1E27EB0517026CCD9A57B9 /* Services */,
+				00B678B6B8BB169D73E6536F /* Views */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		A7EA71B3FC0AF9B2173247A7 /* Vault */ = {
+			isa = PBXGroup;
+			children = (
+				E012C4AAAEA4AA0A3A634737 /* ProductDetailView.swift */,
+				17266FDFA1A9DDA735F40BED /* VaultListView.swift */,
+			);
+			path = Vault;
+			sourceTree = "<group>";
+		};
+		AC1E27EB0517026CCD9A57B9 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				8C041FD1740009BE7B2B95DF /* SessionStore.swift */,
+				678E76E3913152C9B25EB946 /* SupabaseService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		C88341E9E5B5CE3F2FB9F67E = {
+			isa = PBXGroup;
+			children = (
+				977B1E93B97A9EC4EBDB4710 /* Sources */,
+				3A40B702361A8EFE3D1ADFA7 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FA60479ABE3C41C0CD133A62 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				352650403301A44DDD7CC8F7 /* ClaimReadiness.swift */,
+				C8E985AFF655AED2EEAAD90E /* Product.swift */,
+				207C3C0DC2A2D62BBF96E42E /* ProductWithWarranties.swift */,
+				BE783B83190C429DE1DA06FF /* Warranty.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		FBC0786A3C36FC0012A269E9 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				6E147848982B15917349764A /* AuthGate.swift */,
+				209AF14E50F0E88E32BECA71 /* Config.swift */,
+				EB27B3114AE83D31C1CED90C /* WarrantyBuddyApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8A24232B03B7FDD3EFAA35D4 /* WarrantyBuddy */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DDD4FE4F00987B51D539D441 /* Build configuration list for PBXNativeTarget "WarrantyBuddy" */;
+			buildPhases = (
+				84D2B51EB642A039DFBB883E /* Sources */,
+				29F8821C356692528263CB18 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WarrantyBuddy;
+			packageProductDependencies = (
+				6027CB0D6C0D2B5FE966D38D /* Supabase */,
+			);
+			productName = WarrantyBuddy;
+			productReference = 9BECF05D64C0413A1895826C /* WarrantyBuddy.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2EE9AB57FF4F21A7A84960FD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 70C28A15DAE1A77A441DD9C1 /* Build configuration list for PBXProject "WarrantyBuddy" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = C88341E9E5B5CE3F2FB9F67E;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				39F6A219F1FD440383C8BAD8 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 3A40B702361A8EFE3D1ADFA7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8A24232B03B7FDD3EFAA35D4 /* WarrantyBuddy */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		84D2B51EB642A039DFBB883E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1B806728E7A9085BF1AA8C00 /* AuthGate.swift in Sources */,
+				B04A0739FBDB3B5D13A272EE /* ClaimReadiness.swift in Sources */,
+				5644D0146CF72F2AB2E5DFA9 /* Config.swift in Sources */,
+				85D47E04F1EAE4C5A75DD411 /* ForgotPasswordView.swift in Sources */,
+				766E92BF3BB280725EBE2026 /* LoginView.swift in Sources */,
+				7320BAC181684BD42101B2DD /* Product.swift in Sources */,
+				0C4B2F219B08B8367834EFAD /* ProductDetailView.swift in Sources */,
+				5B02E8769A5D5856CD8D7DC2 /* ProductWithWarranties.swift in Sources */,
+				67E7B09B565161380CAADADA /* SessionStore.swift in Sources */,
+				9678342EF9C9E2D6BBE2BAF5 /* SignUpView.swift in Sources */,
+				B14624D5B72D8BF423565031 /* SupabaseService.swift in Sources */,
+				D7ECB17777AA0A53DF05957D /* VaultListView.swift in Sources */,
+				8A9B7B72CA19B6A5AAD3DD09 /* Warranty.swift in Sources */,
+				EB047D4404537C60C1C20BDE /* WarrantyBuddyApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		4DEC5BD2912C7E5BEE5B8E99 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		830B89CBEDF4632FA1CE86EB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = WarrantyBuddy;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mywarrantybuddy.app;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		88C53753680F7B60782B3860 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = WarrantyBuddy;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mywarrantybuddy.app;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		DA7F0BDAF2819CA3C58A8B2D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		70C28A15DAE1A77A441DD9C1 /* Build configuration list for PBXProject "WarrantyBuddy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA7F0BDAF2819CA3C58A8B2D /* Debug */,
+				4DEC5BD2912C7E5BEE5B8E99 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DDD4FE4F00987B51D539D441 /* Build configuration list for PBXNativeTarget "WarrantyBuddy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				88C53753680F7B60782B3860 /* Debug */,
+				830B89CBEDF4632FA1CE86EB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		39F6A219F1FD440383C8BAD8 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.54.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6027CB0D6C0D2B5FE966D38D /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 39F6A219F1FD440383C8BAD8 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 2EE9AB57FF4F21A7A84960FD /* Project object */;
+}
