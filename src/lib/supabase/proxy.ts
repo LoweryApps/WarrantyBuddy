@@ -34,6 +34,12 @@ const PUBLIC_PATHS = [
   // Postmark's inbound-email webhook — authenticated via its own Basic Auth
   // check inside the route handler, never carries a browser session cookie.
   "/api/inbound-email",
+  // Called by both the browser (session cookie) and the native iOS app (no
+  // cookie jar — sends an Authorization: Bearer header instead). This
+  // middleware only ever checks cookies, so a bearer-only request would be
+  // redirected to /login before reaching the route; getUserFromRequest()
+  // inside the handler enforces auth for both cases instead.
+  "/api/extract",
 ];
 
 export async function updateSession(request: NextRequest) {
