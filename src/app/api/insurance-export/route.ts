@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { isPremium } from "@/lib/entitlements";
 import { InsuranceExportDocument, type InsuranceExportItem } from "@/lib/insurance-export-pdf";
-import { createClient } from "@/lib/supabase/server";
+import { getUserFromRequest } from "@/lib/supabase/server";
 import type { ProductCategory } from "@/lib/supabase/types";
 
 export const runtime = "nodejs";
@@ -27,14 +27,11 @@ function buildPath(userId: string) {
 }
 
 export async function GET(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const auth = await getUserFromRequest(request);
+  if (!auth) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const { supabase } = auth;
 
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
@@ -64,14 +61,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const auth = await getUserFromRequest(request);
+  if (!auth) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const { user, supabase } = auth;
 
   const { data: profile } = await supabase
     .from("users")

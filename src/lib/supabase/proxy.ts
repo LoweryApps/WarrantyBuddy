@@ -40,6 +40,8 @@ const PUBLIC_PATHS = [
   // redirected to /login before reaching the route; getUserFromRequest()
   // inside the handler enforces auth for both cases instead.
   "/api/extract",
+  "/api/insurance-export",
+  "/api/account/delete",
 ];
 
 export async function updateSession(request: NextRequest) {
