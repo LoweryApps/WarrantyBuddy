@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { isPremium } from "@/lib/entitlements";
 import { rateLimitResponse } from "@/lib/rate-limit";
-import { createClient } from "@/lib/supabase/server";
+import { getUserFromRequest } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -62,14 +62,11 @@ function extractJson(text: string): unknown {
 }
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const auth = await getUserFromRequest(request);
+  if (!auth) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const { user, supabase } = auth;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
