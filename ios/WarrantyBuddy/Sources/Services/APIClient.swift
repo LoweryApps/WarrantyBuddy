@@ -148,4 +148,36 @@ enum APIClient {
             throw APIError.server(envelope?.error ?? "Couldn't delete your account (\(status)).")
         }
     }
+
+    private struct ConfirmReceiptResponse: Decodable {
+        let ok: Bool?
+        let productId: String?
+        let error: String?
+        let message: String?
+    }
+
+    /// Confirms a forwarded_receipts draft — server-side this creates (or
+    /// links to) a product, inserts the warranty/document rows, checks for
+    /// a recall match, and enforces the free-tier monthly receipt limit /
+    /// Premium gating for warranty-kind drafts. Returns the resulting
+    /// product id.
+    @discardableResult
+    static func confirmReceipt(_ payload: ConfirmReceiptPayload) async throws -> String {
+        guard let accessToken = try? await SupabaseService.client.auth.session.accessToken else {
+            throw APIError.notAuthenticated
+        }
+        var request = URLRequest(url: baseURL.appendingPathComponent("api/forwarded-receipts/confirm"))
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(payload)
+
+        let (responseData, response) = try await URLSession.shared.data(for: request)
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        let envelope = try JSONDecoder().decode(ConfirmReceiptResponse.self, from: responseData)
+        guard status == 200, let productId = envelope.productId else {
+            throw APIError.server(envelope.message ?? envelope.error ?? "Couldn't confirm this receipt (\(status)).")
+        }
+        return productId
+    }
 }

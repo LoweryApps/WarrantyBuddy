@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0144BFF8D4693009A3702AF2 /* ReceiptReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7931ECC3FA7CA1624B1A9D /* ReceiptReviewView.swift */; };
 		0C4B2F219B08B8367834EFAD /* ProductDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E012C4AAAEA4AA0A3A634737 /* ProductDetailView.swift */; };
 		1B806728E7A9085BF1AA8C00 /* AuthGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E147848982B15917349764A /* AuthGate.swift */; };
 		1B9586C6CCC7CCCCEF14C5FE /* ProductFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD12FE282E2A6278EC5FBD89 /* ProductFormView.swift */; };
@@ -20,6 +21,7 @@
 		5644D0146CF72F2AB2E5DFA9 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209AF14E50F0E88E32BECA71 /* Config.swift */; };
 		5B02E8769A5D5856CD8D7DC2 /* ProductWithWarranties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207C3C0DC2A2D62BBF96E42E /* ProductWithWarranties.swift */; };
 		66BF4FD99DDC87AF52C28B18 /* ActivityShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A4DB0A1D49A49C9404796F /* ActivityShareSheet.swift */; };
+		673CF5DCEE055CF6305D1CDB /* ForwardedReceiptDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A9406BB8E9D18F21903881 /* ForwardedReceiptDraft.swift */; };
 		67E7B09B565161380CAADADA /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C041FD1740009BE7B2B95DF /* SessionStore.swift */; };
 		685AEAA7F15616D68C7C1EDA /* DocumentsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF22EC9CE08064FA6EDB2428 /* DocumentsSection.swift */; };
 		7320BAC181684BD42101B2DD /* Product.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E985AFF655AED2EEAAD90E /* Product.swift */; };
@@ -27,6 +29,7 @@
 		7D8E7708122E70C91991766B /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 6027CB0D6C0D2B5FE966D38D /* Supabase */; };
 		85D47E04F1EAE4C5A75DD411 /* ForgotPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4595A2C5C984922747E6DA /* ForgotPasswordView.swift */; };
 		8A9B7B72CA19B6A5AAD3DD09 /* Warranty.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE783B83190C429DE1DA06FF /* Warranty.swift */; };
+		8C731E6566B100D8301CE3AE /* ReceiptQueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CBAEAE5A80255B4C4D0320 /* ReceiptQueueView.swift */; };
 		9678342EF9C9E2D6BBE2BAF5 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B14DA79C412C4E4ECF02E9DF /* SignUpView.swift */; };
 		B04A0739FBDB3B5D13A272EE /* ClaimReadiness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352650403301A44DDD7CC8F7 /* ClaimReadiness.swift */; };
 		B14624D5B72D8BF423565031 /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678E76E3913152C9B25EB946 /* SupabaseService.swift */; };
@@ -46,10 +49,13 @@
 		17266FDFA1A9DDA735F40BED /* VaultListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultListView.swift; sourceTree = "<group>"; };
 		207C3C0DC2A2D62BBF96E42E /* ProductWithWarranties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductWithWarranties.swift; sourceTree = "<group>"; };
 		209AF14E50F0E88E32BECA71 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		29A9406BB8E9D18F21903881 /* ForwardedReceiptDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardedReceiptDraft.swift; sourceTree = "<group>"; };
+		2B7931ECC3FA7CA1624B1A9D /* ReceiptReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptReviewView.swift; sourceTree = "<group>"; };
 		352650403301A44DDD7CC8F7 /* ClaimReadiness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimReadiness.swift; sourceTree = "<group>"; };
 		3697D6A75E537DAF7C097F41 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		3A1FD94CC2B2E31E3117C8E7 /* CSVExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVExport.swift; sourceTree = "<group>"; };
 		3E6ACCC33F0FD37447AFF939 /* SafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
+		41CBAEAE5A80255B4C4D0320 /* ReceiptQueueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptQueueView.swift; sourceTree = "<group>"; };
 		6161FEC6A72793078AB87B22 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		678E76E3913152C9B25EB946 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
 		6E147848982B15917349764A /* AuthGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthGate.swift; sourceTree = "<group>"; };
@@ -90,6 +96,7 @@
 				B5606D8DC20D6CE6F4F53E6D /* AddProduct */,
 				9296A0E0387BECE2158A1C93 /* Auth */,
 				474F2C4CC025CE7584D583F0 /* Recalls */,
+				A767A67C0887782511AF2E8A /* Receipts */,
 				9447913815DE7CE7BF9D53A2 /* Settings */,
 				A7EA71B3FC0AF9B2173247A7 /* Vault */,
 			);
@@ -142,6 +149,15 @@
 			path = Sources;
 			sourceTree = "<group>";
 		};
+		A767A67C0887782511AF2E8A /* Receipts */ = {
+			isa = PBXGroup;
+			children = (
+				41CBAEAE5A80255B4C4D0320 /* ReceiptQueueView.swift */,
+				2B7931ECC3FA7CA1624B1A9D /* ReceiptReviewView.swift */,
+			);
+			path = Receipts;
+			sourceTree = "<group>";
+		};
 		A7EA71B3FC0AF9B2173247A7 /* Vault */ = {
 			isa = PBXGroup;
 			children = (
@@ -187,6 +203,7 @@
 			children = (
 				352650403301A44DDD7CC8F7 /* ClaimReadiness.swift */,
 				A0FCF96D554A6C773CBD4078 /* DocumentRecord.swift */,
+				29A9406BB8E9D18F21903881 /* ForwardedReceiptDraft.swift */,
 				C8E985AFF655AED2EEAAD90E /* Product.swift */,
 				84AA383CF1A34EAEAA7FED63 /* ProductDraft.swift */,
 				207C3C0DC2A2D62BBF96E42E /* ProductWithWarranties.swift */,
@@ -278,6 +295,7 @@
 				38C3B9E3A11934670466CCD1 /* DocumentRecord.swift in Sources */,
 				685AEAA7F15616D68C7C1EDA /* DocumentsSection.swift in Sources */,
 				85D47E04F1EAE4C5A75DD411 /* ForgotPasswordView.swift in Sources */,
+				673CF5DCEE055CF6305D1CDB /* ForwardedReceiptDraft.swift in Sources */,
 				766E92BF3BB280725EBE2026 /* LoginView.swift in Sources */,
 				D5554E0321A6575CC3EF94CD /* MainTabView.swift in Sources */,
 				26763B813723151AA5A37F68 /* PhotoCaptureView.swift in Sources */,
@@ -288,6 +306,8 @@
 				5B02E8769A5D5856CD8D7DC2 /* ProductWithWarranties.swift in Sources */,
 				47526BB03DDC4009C6B47DA8 /* RecallAlert.swift in Sources */,
 				D20ABD82BFBEBC75F56AACAA /* RecallsListView.swift in Sources */,
+				8C731E6566B100D8301CE3AE /* ReceiptQueueView.swift in Sources */,
+				0144BFF8D4693009A3702AF2 /* ReceiptReviewView.swift in Sources */,
 				206BDDE36587A2C08E8BF167 /* SafariView.swift in Sources */,
 				67E7B09B565161380CAADADA /* SessionStore.swift in Sources */,
 				BC89B23ED63D2CF719E1598F /* SettingsListView.swift in Sources */,

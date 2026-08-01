@@ -6,6 +6,7 @@ struct VaultListView: View {
     @State private var isLoading = true
     @State private var errorMessage: String?
     @State private var showingAdd = false
+    @State private var pendingReceiptCount = 0
 
     var body: some View {
         Group {
@@ -14,9 +15,23 @@ struct VaultListView: View {
             } else if let errorMessage {
                 ContentUnavailableView("Couldn't load your vault", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
             } else if products.isEmpty {
-                ContentUnavailableView("No products yet", systemImage: "shield", description: Text("Tap + to add your first product."))
+                VStack {
+                    if pendingReceiptCount > 0 {
+                        NavigationLink(value: ReceiptBannerDestination()) {
+                            ReceiptBanner(count: pendingReceiptCount)
+                        }
+                        .padding()
+                    }
+                    ContentUnavailableView("No products yet", systemImage: "shield", description: Text("Tap + to add your first product."))
+                }
             } else {
                 List {
+                    if pendingReceiptCount > 0 {
+                        NavigationLink(value: ReceiptBannerDestination()) {
+                            ReceiptBanner(count: pendingReceiptCount)
+                        }
+                        .listRowSeparator(.hidden)
+                    }
                     ForEach(products) { item in
                         NavigationLink(value: item) {
                             VaultRow(item: item)
@@ -32,6 +47,9 @@ struct VaultListView: View {
             }
         }
         .navigationTitle("Your vault")
+        .navigationDestination(for: ReceiptBannerDestination.self) { _ in
+            ReceiptQueueView()
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -72,7 +90,43 @@ struct VaultListView: View {
         } catch {
             errorMessage = error.localizedDescription
         }
+
+        let count = try? await SupabaseService.client
+            .from("forwarded_receipts")
+            .select("id", head: true, count: .exact)
+            .eq("status", value: "Pending Review")
+            .execute()
+            .count
+        pendingReceiptCount = count ?? 0
+
         isLoading = false
+    }
+}
+
+// Hashable placeholder for NavigationLink(value:) — the destination screen
+// doesn't need any data, it fetches its own.
+struct ReceiptBannerDestination: Hashable {}
+
+// Mirrors receipt-banner.tsx.
+struct ReceiptBanner: View {
+    let count: Int
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "text.bubble")
+                .foregroundStyle(Color.teal)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(count) receipt\(count == 1 ? "" : "s") waiting for review")
+                    .font(.caption).bold().foregroundStyle(Color.teal)
+                Text("Buddy read your forwarded emails and is ready to confirm")
+                    .font(.caption2).foregroundStyle(Color.teal.opacity(0.8))
+            }
+            Spacer()
+            Image(systemName: "chevron.right").font(.caption).foregroundStyle(Color.teal)
+        }
+        .padding(10)
+        .background(Color.teal.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.teal.opacity(0.4)))
     }
 }
 
