@@ -9,6 +9,18 @@ struct SettingsListView: View {
     @State private var errorMessage: String?
     @State private var copiedForwarding = false
 
+    @State private var isExportingCSV = false
+    @State private var csvExportURL: URL?
+
+    @State private var isGeneratingInsurance = false
+    @State private var insuranceExportURL: URL?
+    @State private var insuranceError: String?
+
+    @State private var showingDeleteConfirm = false
+    @State private var deleteConfirmText = ""
+    @State private var isDeletingAccount = false
+    @State private var deleteError: String?
+
     var body: some View {
         Group {
             if isLoading {
@@ -71,6 +83,35 @@ struct SettingsListView: View {
                             .disabled(isSaving)
                     }
 
+                    Section("Data & privacy") {
+                        Button {
+                            Task { await exportCSV() }
+                        } label: {
+                            if isExportingCSV {
+                                ProgressView()
+                            } else {
+                                Label("Export all data as CSV", systemImage: "square.and.arrow.up")
+                            }
+                        }
+                        .disabled(isExportingCSV)
+
+                        Button {
+                            Task { await generateInsuranceExport() }
+                        } label: {
+                            if isGeneratingInsurance {
+                                ProgressView()
+                            } else {
+                                Label("Generate insurance inventory", systemImage: "doc.text")
+                            }
+                        }
+                        .disabled(isGeneratingInsurance)
+                        if let insuranceError {
+                            Text(insuranceError).font(.caption).foregroundStyle(.red)
+                        }
+
+                        deleteAccountControl
+                    }
+
                     Section {
                         Button("Sign out", role: .destructive) {
                             Task { try? await SupabaseService.client.auth.signOut() }
@@ -81,6 +122,46 @@ struct SettingsListView: View {
         }
         .navigationTitle("Settings")
         .task { await load() }
+        .sheet(item: $csvExportURL) { url in
+            ActivityShareSheet(items: [url])
+        }
+        .sheet(item: $insuranceExportURL) { url in
+            SafariView(url: url)
+        }
+    }
+
+    @ViewBuilder
+    private var deleteAccountControl: some View {
+        if !showingDeleteConfirm {
+            Button("Delete my account", role: .destructive) {
+                showingDeleteConfirm = true
+            }
+        } else {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("This will permanently delete all your products, warranties, documents, and receipts. This cannot be undone.")
+                    .font(.caption).foregroundStyle(.red)
+                if let deleteError {
+                    Text(deleteError).font(.caption).foregroundStyle(.red)
+                }
+                Text("Type DELETE to confirm").font(.caption).foregroundStyle(.secondary)
+                TextField("DELETE", text: $deleteConfirmText)
+                    .textFieldStyle(.roundedBorder)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.characters)
+                HStack {
+                    Button("Cancel") {
+                        showingDeleteConfirm = false
+                        deleteConfirmText = ""
+                        deleteError = nil
+                    }
+                    Spacer()
+                    Button(isDeletingAccount ? "Deleting…" : "Yes, delete everything", role: .destructive) {
+                        Task { await deleteAccount() }
+                    }
+                    .disabled(deleteConfirmText != "DELETE" || isDeletingAccount)
+                }
+            }
+        }
     }
 
     private func load() async {
@@ -121,5 +202,49 @@ struct SettingsListView: View {
             errorMessage = error.localizedDescription
         }
         isSaving = false
+    }
+
+    private func exportCSV() async {
+        guard let userId = session.userId else { return }
+        isExportingCSV = true
+        do {
+            let products: [ProductWithWarranties] = try await SupabaseService.client
+                .from("products")
+                .select("*, warranties(*)")
+                .eq("user_id", value: userId)
+                .order("created_at", ascending: false)
+                .execute()
+                .value
+            let csv = CSVExport.generate(from: products)
+            let url = FileManager.default.temporaryDirectory.appendingPathComponent("warrantybuddy-export-\(UUID().uuidString).csv")
+            try csv.write(to: url, atomically: true, encoding: .utf8)
+            csvExportURL = url
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isExportingCSV = false
+    }
+
+    private func generateInsuranceExport() async {
+        isGeneratingInsurance = true
+        insuranceError = nil
+        do {
+            insuranceExportURL = try await APIClient.generateInsuranceExport()
+        } catch {
+            insuranceError = error.localizedDescription
+        }
+        isGeneratingInsurance = false
+    }
+
+    private func deleteAccount() async {
+        isDeletingAccount = true
+        deleteError = nil
+        do {
+            try await APIClient.deleteAccount()
+            try? await SupabaseService.client.auth.signOut()
+        } catch {
+            deleteError = error.localizedDescription
+        }
+        isDeletingAccount = false
     }
 }

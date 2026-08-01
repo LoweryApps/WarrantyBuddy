@@ -16,8 +16,10 @@
 		38C3B9E3A11934670466CCD1 /* DocumentRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0FCF96D554A6C773CBD4078 /* DocumentRecord.swift */; };
 		41012737F6A03A78CF005BB0 /* AddProductView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C94530A139A88BE6D69B99 /* AddProductView.swift */; };
 		47526BB03DDC4009C6B47DA8 /* RecallAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA291F4B4DE8593A12AAB72 /* RecallAlert.swift */; };
+		5319D08217137A18CD43006D /* CSVExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1FD94CC2B2E31E3117C8E7 /* CSVExport.swift */; };
 		5644D0146CF72F2AB2E5DFA9 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209AF14E50F0E88E32BECA71 /* Config.swift */; };
 		5B02E8769A5D5856CD8D7DC2 /* ProductWithWarranties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207C3C0DC2A2D62BBF96E42E /* ProductWithWarranties.swift */; };
+		66BF4FD99DDC87AF52C28B18 /* ActivityShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A4DB0A1D49A49C9404796F /* ActivityShareSheet.swift */; };
 		67E7B09B565161380CAADADA /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C041FD1740009BE7B2B95DF /* SessionStore.swift */; };
 		685AEAA7F15616D68C7C1EDA /* DocumentsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF22EC9CE08064FA6EDB2428 /* DocumentsSection.swift */; };
 		7320BAC181684BD42101B2DD /* Product.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E985AFF655AED2EEAAD90E /* Product.swift */; };
@@ -38,6 +40,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		07A4DB0A1D49A49C9404796F /* ActivityShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityShareSheet.swift; sourceTree = "<group>"; };
 		0D988B688E6B4EB074842EAA /* RecallsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecallsListView.swift; sourceTree = "<group>"; };
 		110B206DC65E10B301268860 /* SettingsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsListView.swift; sourceTree = "<group>"; };
 		17266FDFA1A9DDA735F40BED /* VaultListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultListView.swift; sourceTree = "<group>"; };
@@ -45,6 +48,7 @@
 		209AF14E50F0E88E32BECA71 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		352650403301A44DDD7CC8F7 /* ClaimReadiness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimReadiness.swift; sourceTree = "<group>"; };
 		3697D6A75E537DAF7C097F41 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
+		3A1FD94CC2B2E31E3117C8E7 /* CSVExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVExport.swift; sourceTree = "<group>"; };
 		3E6ACCC33F0FD37447AFF939 /* SafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
 		6161FEC6A72793078AB87B22 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		678E76E3913152C9B25EB946 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
@@ -121,6 +125,7 @@
 		9447913815DE7CE7BF9D53A2 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				07A4DB0A1D49A49C9404796F /* ActivityShareSheet.swift */,
 				110B206DC65E10B301268860 /* SettingsListView.swift */,
 			);
 			path = Settings;
@@ -152,6 +157,7 @@
 			isa = PBXGroup;
 			children = (
 				AF1E9EBB84174254ADAE130A /* APIClient.swift */,
+				3A1FD94CC2B2E31E3117C8E7 /* CSVExport.swift */,
 				8C041FD1740009BE7B2B95DF /* SessionStore.swift */,
 				678E76E3913152C9B25EB946 /* SupabaseService.swift */,
 			);
@@ -263,8 +269,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				D557420C320C571D4061F22C /* APIClient.swift in Sources */,
+				66BF4FD99DDC87AF52C28B18 /* ActivityShareSheet.swift in Sources */,
 				41012737F6A03A78CF005BB0 /* AddProductView.swift in Sources */,
 				1B806728E7A9085BF1AA8C00 /* AuthGate.swift in Sources */,
+				5319D08217137A18CD43006D /* CSVExport.swift in Sources */,
 				B04A0739FBDB3B5D13A272EE /* ClaimReadiness.swift in Sources */,
 				5644D0146CF72F2AB2E5DFA9 /* Config.swift in Sources */,
 				38C3B9E3A11934670466CCD1 /* DocumentRecord.swift in Sources */,
