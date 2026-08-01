@@ -8,51 +8,44 @@ struct VaultListView: View {
     @State private var showingAdd = false
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if isLoading {
-                    ProgressView()
-                } else if let errorMessage {
-                    ContentUnavailableView("Couldn't load your vault", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
-                } else if products.isEmpty {
-                    ContentUnavailableView("No products yet", systemImage: "shield", description: Text("Tap + to add your first product."))
-                } else {
-                    List {
-                        ForEach(products) { item in
-                            NavigationLink(value: item) {
-                                VaultRow(item: item)
-                            }
-                        }
-                        .onDelete { offsets in
-                            Task { await delete(at: offsets) }
+        Group {
+            if isLoading {
+                ProgressView()
+            } else if let errorMessage {
+                ContentUnavailableView("Couldn't load your vault", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
+            } else if products.isEmpty {
+                ContentUnavailableView("No products yet", systemImage: "shield", description: Text("Tap + to add your first product."))
+            } else {
+                List {
+                    ForEach(products) { item in
+                        NavigationLink(value: item) {
+                            VaultRow(item: item)
                         }
                     }
-                    .navigationDestination(for: ProductWithWarranties.self) { item in
-                        ProductDetailView(item: item, onChanged: { Task { await load() } })
+                    .onDelete { offsets in
+                        Task { await delete(at: offsets) }
                     }
                 }
-            }
-            .navigationTitle("Your vault")
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Sign out") {
-                        Task { try? await SupabaseService.client.auth.signOut() }
-                    }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showingAdd = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
+                .navigationDestination(for: ProductWithWarranties.self) { item in
+                    ProductDetailView(item: item, onChanged: { Task { await load() } })
                 }
             }
-            .sheet(isPresented: $showingAdd) {
-                AddProductView { Task { await load() } }
-            }
-            .task { await load() }
-            .refreshable { await load() }
         }
+        .navigationTitle("Your vault")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showingAdd = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+        }
+        .sheet(isPresented: $showingAdd) {
+            AddProductView { Task { await load() } }
+        }
+        .task { await load() }
+        .refreshable { await load() }
     }
 
     private func delete(at offsets: IndexSet) async {

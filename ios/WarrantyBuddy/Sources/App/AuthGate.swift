@@ -11,7 +11,7 @@ struct AuthGate: View {
             if session.isLoading {
                 ProgressView()
             } else if session.session != nil {
-                VaultListView()
+                MainTabView()
             } else {
                 LoginView()
             }

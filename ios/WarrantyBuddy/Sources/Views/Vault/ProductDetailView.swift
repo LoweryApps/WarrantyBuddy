@@ -61,6 +61,8 @@ struct ProductDetailView: View {
                 }
             }
 
+            DocumentsSection(productId: item.id)
+
             Section {
                 Button("Delete product", role: .destructive) {
                     showingDeleteConfirm = true
