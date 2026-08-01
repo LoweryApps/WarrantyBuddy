@@ -42,6 +42,7 @@ const PUBLIC_PATHS = [
   "/api/extract",
   "/api/insurance-export",
   "/api/account/delete",
+  "/api/forwarded-receipts/confirm",
 ];
 
 export async function updateSession(request: NextRequest) {

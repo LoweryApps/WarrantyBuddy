@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { FREE_RECEIPT_MONTHLY_LIMIT, getMonthlyConfirmedReceiptCount, isPremium } from "@/lib/entitlements";
 import { findRecallMatch } from "@/lib/recall-match";
-import { createClient } from "@/lib/supabase/server";
+import { getUserFromRequest } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -21,14 +21,11 @@ interface ConfirmBody {
 }
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const auth = await getUserFromRequest(request);
+  if (!auth) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const { user, supabase } = auth;
 
   const body = (await request.json()) as Partial<ConfirmBody>;
   if (typeof body.draftId !== "string") {
