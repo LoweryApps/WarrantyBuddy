@@ -125,6 +125,33 @@ enum APIClient {
         return url
     }
 
+    private struct BillingPortalResponse: Decodable {
+        let url: String?
+        let error: String?
+        let message: String?
+    }
+
+    /// Opens a Stripe billing-portal session for the signed-in user's
+    /// existing subscription (matches PlanSection.tsx's "Manage subscription"
+    /// button). Only callable when the user actually has a subscription —
+    /// the backend 400s with "No subscription on file" otherwise.
+    static func createBillingPortalSession() async throws -> URL {
+        guard let accessToken = try? await SupabaseService.client.auth.session.accessToken else {
+            throw APIError.notAuthenticated
+        }
+        var request = URLRequest(url: baseURL.appendingPathComponent("api/stripe/portal"))
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+
+        let (responseData, response) = try await URLSession.shared.data(for: request)
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        let envelope = try JSONDecoder().decode(BillingPortalResponse.self, from: responseData)
+        guard status == 200, let urlString = envelope.url, let url = URL(string: urlString) else {
+            throw APIError.server(envelope.message ?? envelope.error ?? "Couldn't open the billing portal (\(status)).")
+        }
+        return url
+    }
+
     private struct DeleteAccountResponse: Decodable {
         let ok: Bool?
         let error: String?

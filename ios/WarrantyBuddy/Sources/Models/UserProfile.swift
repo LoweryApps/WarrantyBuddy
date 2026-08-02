@@ -10,6 +10,7 @@ struct UserProfile: Codable, Hashable {
     var forwardingAddress: String
     var subscriptionStatus: String?
     var plan: String?
+    var currentPeriodEnd: String?
 
     enum CodingKeys: String, CodingKey {
         case fullName = "full_name"
@@ -19,6 +20,7 @@ struct UserProfile: Codable, Hashable {
         case forwardingAddress = "forwarding_address"
         case subscriptionStatus = "subscription_status"
         case plan
+        case currentPeriodEnd = "current_period_end"
     }
 }
 

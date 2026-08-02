@@ -21,6 +21,10 @@ struct SettingsListView: View {
     @State private var isDeletingAccount = false
     @State private var deleteError: String?
 
+    @State private var isOpeningPortal = false
+    @State private var billingPortalURL: URL?
+    @State private var portalError: String?
+
     var body: some View {
         Group {
             if isLoading {
@@ -77,16 +81,36 @@ struct SettingsListView: View {
                         Label("Email forwarding", systemImage: "envelope.arrow.triangle.branch")
                     }
 
+                    let plan = planDisplay(profile)
                     Section {
                         HStack {
-                            Text(profile.plan ?? "Free")
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(plan.label).font(.brandBody(14, weight: .medium))
+                                Text(plan.sublabel).font(.brandBody(11)).foregroundStyle(.secondary)
+                            }
                             Spacer()
-                            if let status = profile.subscriptionStatus {
-                                Text(status).font(.brandBody(11)).foregroundStyle(.secondary)
+                            if plan.showManageButton {
+                                Button {
+                                    Task { await openBillingPortal() }
+                                } label: {
+                                    if isOpeningPortal {
+                                        Text("Opening…")
+                                    } else {
+                                        Text("Manage subscription")
+                                    }
+                                }
+                                .font(.brandBody(11))
+                                .buttonStyle(.bordered)
+                                .disabled(isOpeningPortal)
                             }
                         }
+                        if let portalError {
+                            Text(portalError).font(.brandBody(11)).foregroundStyle(Color.brandRed)
+                        }
                     } header: {
-                        Label("Plan", systemImage: "star")
+                        Label("Plan", systemImage: plan.isPremium ? "crown.fill" : "sparkles")
+                    } footer: {
+                        Text(plan.subtitle)
                     }
 
                     Section {
@@ -157,6 +181,100 @@ struct SettingsListView: View {
         .sheet(isPresented: $showingDeleteSheet) {
             deleteAccountSheet
         }
+        .sheet(item: $billingPortalURL) { url in
+            SafariView(url: url)
+        }
+    }
+
+    // Mirrors src/components/settings/plan-section.tsx exactly, including
+    // the closed-beta behavior: `premium` is hardcoded true here the same
+    // way BETA_ALL_FEATURES_UNLOCKED is hardcoded true in
+    // src/lib/entitlements.ts — flip both together when the beta ends.
+    // Until then, `hasRealSubscription` (a real Stripe subscription_status)
+    // is what actually distinguishes "beta access" from "paying customer".
+    private func planDisplay(_ profile: UserProfile) -> PlanDisplay {
+        let premium = true
+        let hasRealSubscription = profile.subscriptionStatus != nil
+        let betaUnlocked = premium && !hasRealSubscription
+
+        if betaUnlocked {
+            return PlanDisplay(
+                isPremium: true,
+                subtitle: "Beta — full access",
+                label: "All features unlocked",
+                sublabel: "Unlimited products & receipts for everyone during the closed beta",
+                showManageButton: false
+            )
+        }
+        if premium, let status = profile.subscriptionStatus {
+            var sublabel = Self.statusLabels[status] ?? status
+            if let currentPeriodEnd = profile.currentPeriodEnd, let date = Self.parseISODate(currentPeriodEnd) {
+                sublabel += " · renews \(Self.shortDateFormatter.string(from: date))"
+            }
+            return PlanDisplay(
+                isPremium: true,
+                subtitle: "You're on Premium",
+                label: profile.plan.flatMap { Self.planLabels[$0] } ?? "Premium",
+                sublabel: sublabel,
+                showManageButton: true
+            )
+        }
+        return PlanDisplay(
+            isPremium: false,
+            subtitle: "Free plan",
+            label: "Free",
+            sublabel: "Up to 5 products, 3 receipts/month",
+            showManageButton: false
+        )
+    }
+
+    private struct PlanDisplay {
+        let isPremium: Bool
+        let subtitle: String
+        let label: String
+        let sublabel: String
+        let showManageButton: Bool
+    }
+
+    private static let planLabels: [String: String] = [
+        "founding_monthly": "Founding member — Monthly",
+        "founding_annual": "Founding member — Annual",
+        "regular_monthly": "Premium — Monthly",
+        "regular_annual": "Premium — Annual",
+    ]
+
+    private static let statusLabels: [String: String] = [
+        "active": "Active",
+        "trialing": "Trial",
+        "past_due": "Payment past due",
+        "canceled": "Canceled",
+        "incomplete": "Incomplete",
+        "incomplete_expired": "Expired",
+        "unpaid": "Unpaid",
+    ]
+
+    private static func parseISODate(_ string: String) -> Date? {
+        let withFractional = ISO8601DateFormatter()
+        withFractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = withFractional.date(from: string) { return date }
+        return ISO8601DateFormatter().date(from: string)
+    }
+
+    private static let shortDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        return formatter
+    }()
+
+    private func openBillingPortal() async {
+        isOpeningPortal = true
+        portalError = nil
+        do {
+            billingPortalURL = try await APIClient.createBillingPortalSession()
+        } catch {
+            portalError = error.localizedDescription
+        }
+        isOpeningPortal = false
     }
 
     private var deleteAccountSheet: some View {
@@ -209,7 +327,7 @@ struct SettingsListView: View {
         do {
             let result: UserProfile = try await SupabaseService.client
                 .from("users")
-                .select("full_name, phone, claim_email, notification_email, forwarding_address, subscription_status, plan")
+                .select("full_name, phone, claim_email, notification_email, forwarding_address, subscription_status, plan, current_period_end")
                 .eq("id", value: userId)
                 .single()
                 .execute()
