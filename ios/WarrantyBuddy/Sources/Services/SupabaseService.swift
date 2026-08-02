@@ -6,6 +6,9 @@ import Supabase
 enum SupabaseService {
     static let client = SupabaseClient(
         supabaseURL: Config.supabaseURL,
-        supabaseKey: Config.supabaseAnonKey
+        supabaseKey: Config.supabaseAnonKey,
+        options: SupabaseClientOptions(
+            auth: SupabaseClientOptions.AuthOptions(emitLocalSessionAsInitialSession: true)
+        )
     )
 }

@@ -11,7 +11,10 @@ final class SessionStore: ObservableObject {
     func start() {
         authTask = Task {
             for await (_, session) in SupabaseService.client.auth.authStateChanges {
-                self.session = session
+                // With emitLocalSessionAsInitialSession enabled, the initial session is
+                // emitted before a refresh is attempted, so it may already be expired.
+                // A tokenRefreshed event follows shortly after if it can be renewed.
+                self.session = session?.isExpired == true ? nil : session
                 self.isLoading = false
             }
         }
