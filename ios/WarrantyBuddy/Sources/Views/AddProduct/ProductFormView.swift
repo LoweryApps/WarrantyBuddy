@@ -13,7 +13,6 @@ struct ProductFormView: View {
 
     @State private var isSaving = false
     @State private var errorMessage: String?
-    @State private var showDatePicker = false
 
     init(mode: ProductFormMode, initialDraft: ProductDraft, onSaved: @escaping () -> Void) {
         self.mode = mode
@@ -24,10 +23,10 @@ struct ProductFormView: View {
     var body: some View {
         Form {
             if let errorMessage {
-                Text(errorMessage).font(.footnote).foregroundStyle(.red)
+                ErrorBanner(message: errorMessage)
             }
 
-            Section("Product details") {
+            Section {
                 TextField("Name", text: $draft.name)
                 TextField("Brand", text: $draft.brand)
                 TextField("Model number", text: $draft.modelNumber)
@@ -37,23 +36,31 @@ struct ProductFormView: View {
                 }
                 TextField("Room / location", text: $draft.roomLocation)
                 TextField("Quantity", text: $draft.quantity).keyboardType(.numberPad)
+            } header: {
+                Label("Product details", systemImage: "shippingbox")
             }
 
-            Section("Purchase details") {
+            Section {
                 Toggle("Has a purchase date", isOn: Binding(
                     get: { draft.purchaseDate != nil },
-                    set: { draft.purchaseDate = $0 ? (draft.purchaseDate ?? Date()) : nil }
+                    set: { hasDate in
+                        withAnimation { draft.purchaseDate = hasDate ? (draft.purchaseDate ?? Date()) : nil }
+                    }
                 ))
                 if let date = draft.purchaseDate {
                     DatePicker("Purchase date", selection: Binding(
                         get: { date },
                         set: { draft.purchaseDate = $0 }
                     ), displayedComponents: .date)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
                 }
                 TextField("Purchase price", text: $draft.purchasePrice).keyboardType(.decimalPad)
                 TextField("Retailer", text: $draft.retailer)
+            } header: {
+                Label("Purchase details", systemImage: "cart")
             }
         }
+        .tint(.brandTeal)
         .navigationTitle(draft.name.isEmpty ? "New product" : draft.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -62,6 +69,7 @@ struct ProductFormView: View {
                     ProgressView()
                 } else {
                     Button("Save") { Task { await save() } }
+                        .fontWeight(.semibold)
                         .disabled(draft.name.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
@@ -84,8 +92,10 @@ struct ProductFormView: View {
                     .eq("id", value: productId)
                     .execute()
             }
+            Haptics.success()
             onSaved()
         } catch {
+            Haptics.error()
             errorMessage = error.localizedDescription
         }
         isSaving = false

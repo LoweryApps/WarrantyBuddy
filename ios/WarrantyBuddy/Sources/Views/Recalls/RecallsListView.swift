@@ -26,6 +26,8 @@ struct RecallsListView: View {
                         Section("Active") {
                             ForEach(active) { alert in
                                 RecallAlertRow(alert: alert, onResolve: { await resolve(alert) })
+                                    .listRowSeparator(.hidden)
+                                    .listRowBackground(Color.clear)
                             }
                         }
                     }
@@ -33,10 +35,14 @@ struct RecallsListView: View {
                         Section("Resolved") {
                             ForEach(resolved) { alert in
                                 RecallAlertRow(alert: alert, onResolve: nil)
+                                    .listRowSeparator(.hidden)
+                                    .listRowBackground(Color.clear)
+                                    .opacity(0.7)
                             }
                         }
                     }
                 }
+                .listStyle(.plain)
             }
         }
         .navigationTitle("Recalls")
@@ -78,19 +84,22 @@ private struct RecallAlertRow: View {
     @State private var expanded = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: Spacing.sm) {
             Button {
                 withAnimation { expanded.toggle() }
             } label: {
                 HStack {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(Color.brandRed)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(alert.products?.name ?? "Unknown product").font(.subheadline).bold()
+                        Text(alert.products?.name ?? "Unknown product")
+                            .font(.brandBody(15, weight: .semibold))
                             .foregroundStyle(.primary)
                         if let source = alert.recalls?.source {
-                            Text(source).font(.caption2).bold()
-                                .padding(.horizontal, 6).padding(.vertical, 2)
-                                .background(Color.red.opacity(0.12), in: Capsule())
-                                .foregroundStyle(.red)
+                            Text(source).font(.brandBody(10, weight: .bold))
+                                .padding(.horizontal, Spacing.sm).padding(.vertical, 2)
+                                .background(Color.brandRed.opacity(0.12), in: Capsule())
+                                .foregroundStyle(Color.brandRed)
                         }
                     }
                     Spacer()
@@ -102,21 +111,27 @@ private struct RecallAlertRow: View {
 
             if expanded {
                 if let description = alert.recalls?.description, !description.isEmpty {
-                    Text(description).font(.footnote).foregroundStyle(.secondary)
+                    Text(description).font(.brandBody(13)).foregroundStyle(.secondary)
                 }
                 if let remedy = alert.recalls?.remedy, !remedy.isEmpty {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("REMEDY").font(.caption2).bold().foregroundStyle(.orange)
-                        Text(remedy).font(.footnote)
+                        Text("REMEDY").font(.brandBody(10, weight: .bold)).foregroundStyle(Color.brandAmber)
+                        Text(remedy).font(.brandBody(13))
                     }
                 }
                 if let onResolve {
-                    Button("Mark resolved") { Task { await onResolve() } }
-                        .font(.footnote)
-                        .buttonStyle(.bordered)
+                    Button {
+                        Haptics.success()
+                        Task { await onResolve() }
+                    } label: {
+                        Label("Mark resolved", systemImage: "checkmark.circle")
+                    }
+                    .font(.brandBody(13))
+                    .buttonStyle(.bordered)
+                    .tint(.brandTeal)
                 }
             }
         }
-        .padding(.vertical, 4)
+        .cardStyle(padding: Spacing.md)
     }
 }

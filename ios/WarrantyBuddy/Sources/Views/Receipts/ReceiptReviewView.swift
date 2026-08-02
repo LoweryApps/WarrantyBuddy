@@ -42,35 +42,41 @@ struct ReceiptReviewView: View {
     var body: some View {
         Form {
             if let errorMessage {
-                Text(errorMessage).font(.footnote).foregroundStyle(.red)
+                ErrorBanner(message: errorMessage)
             }
 
-            Section("Link to a product") {
+            Section {
                 Picker("Existing product", selection: $selectedExistingProductId) {
                     Text("Create a new product").tag(String?.none)
                     ForEach(existingProducts) { p in
                         Text(p.name).tag(String?.some(p.id))
                     }
                 }
+            } header: {
+                Label("Link to a product", systemImage: "link")
             }
 
             if selectedExistingProductId == nil {
-                Section("Product details") {
+                Section {
                     TextField("Product name", text: $productName)
                     TextField("Brand", text: $brand)
                     TextField("Retailer", text: $retailer)
                     TextField("Order date (YYYY-MM-DD)", text: $orderDate)
                     TextField("Price", text: $price).keyboardType(.decimalPad)
+                } header: {
+                    Label("Product details", systemImage: "shippingbox")
                 }
             }
 
             if draft.isWarranty {
-                Section("Warranty details") {
+                Section {
                     TextField("Start date (YYYY-MM-DD)", text: $warrantyStart)
                     TextField("End date (YYYY-MM-DD)", text: $warrantyEnd)
                     TextField("Coverage", text: $coverage, axis: .vertical)
                     TextField("Exclusions", text: $exclusions, axis: .vertical)
                     TextField("Claim contact", text: $claimContact)
+                } header: {
+                    Label("Warranty details", systemImage: "checkmark.shield")
                 }
             }
 
@@ -79,14 +85,15 @@ struct ReceiptReviewView: View {
                     Task { await confirm() }
                 } label: {
                     if isConfirming {
-                        ProgressView()
+                        ProgressView().frame(maxWidth: .infinity)
                     } else {
-                        Text("Confirm").bold()
+                        Text("Confirm").bold().frame(maxWidth: .infinity)
                     }
                 }
                 .disabled(isConfirming || (selectedExistingProductId == nil && productName.trimmingCharacters(in: .whitespaces).isEmpty))
             }
         }
+        .tint(.brandTeal)
         .navigationTitle("Review")
         .navigationBarTitleDisplayMode(.inline)
         .task { await loadExistingProducts() }
@@ -116,9 +123,11 @@ struct ReceiptReviewView: View {
                 claimContact: claimContact
             )
             try await APIClient.confirmReceipt(payload)
+            Haptics.success()
             onConfirmed()
             dismiss()
         } catch {
+            Haptics.error()
             errorMessage = error.localizedDescription
         }
         isConfirming = false

@@ -15,31 +15,29 @@ struct SignUpView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Create your account").font(.title3).bold()
+                VStack(alignment: .leading, spacing: Spacing.lg) {
+                    Text("Create your account").font(.brandDisplay(20)).foregroundStyle(Color.brandNavy)
                     Text("Free to start. No credit card needed.")
-                        .font(.footnote).foregroundStyle(.secondary)
+                        .font(.brandBody(13)).foregroundStyle(.secondary)
 
                     if let errorMessage {
-                        Text(errorMessage)
-                            .font(.footnote)
-                            .foregroundStyle(.red)
-                            .padding(10)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+                        ErrorBanner(message: errorMessage)
                     }
 
                     if didSignUp {
-                        Text("Check your email to confirm your account, then sign in.")
-                            .font(.subheadline)
-                            .padding(10)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color.teal.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
+                        HStack(alignment: .top, spacing: Spacing.sm) {
+                            Image(systemName: "envelope.badge.fill").foregroundStyle(Color.brandTeal)
+                            Text("Check your email to confirm your account, then sign in.")
+                                .font(.brandBody(14))
+                        }
+                        .padding(Spacing.md)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.brandTeal.opacity(0.1), in: RoundedRectangle(cornerRadius: Radius.sm))
                     } else {
                         labeledField("Full name", text: $fullName, placeholder: "Alex Johnson")
                         labeledField("Email address", text: $email, placeholder: "alex@example.com", keyboard: .emailAddress)
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("Password").font(.caption).foregroundStyle(.secondary)
+                            Text("Password").font(.brandBody(11)).foregroundStyle(.secondary)
                             SecureField("At least 8 characters", text: $password)
                                 .textFieldStyle(.roundedBorder)
                         }
@@ -48,12 +46,15 @@ struct SignUpView: View {
                             HStack(spacing: 4) {
                                 Text("I agree to the")
                                 Button("Terms") { openURL(URL(string: "https://www.mywarrantybuddy.com/terms")!) }
+                                    .foregroundStyle(Color.brandTeal)
                                 Text("and")
                                 Button("Privacy Policy") { openURL(URL(string: "https://www.mywarrantybuddy.com/privacy")!) }
+                                    .foregroundStyle(Color.brandTeal)
                             }
-                            .font(.footnote)
+                            .font(.brandBody(12))
                         }
                         .toggleStyle(.switch)
+                        .tint(.brandTeal)
 
                         Button {
                             Task { await signUp() }
@@ -65,7 +66,7 @@ struct SignUpView: View {
                             }
                         }
                         .buttonStyle(.borderedProminent)
-                        .tint(.teal)
+                        .tint(.brandTeal)
                         .controlSize(.large)
                         .disabled(fullName.isEmpty || email.isEmpty || password.count < 8 || !agreed || isLoading)
                     }
@@ -83,7 +84,7 @@ struct SignUpView: View {
     @ViewBuilder
     private func labeledField(_ label: String, text: Binding<String>, placeholder: String, keyboard: UIKeyboardType = .default) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(label).font(.caption).foregroundStyle(.secondary)
+            Text(label).font(.brandBody(11)).foregroundStyle(.secondary)
             TextField(placeholder, text: text)
                 .textFieldStyle(.roundedBorder)
                 .keyboardType(keyboard)
@@ -101,8 +102,10 @@ struct SignUpView: View {
                 password: password,
                 data: ["full_name": .string(fullName)]
             )
+            Haptics.success()
             didSignUp = true
         } catch {
+            Haptics.error()
             errorMessage = error.localizedDescription
         }
         isLoading = false

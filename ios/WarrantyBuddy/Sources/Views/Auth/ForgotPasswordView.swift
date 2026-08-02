@@ -10,21 +10,24 @@ struct ForgotPasswordView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Reset your password").font(.title3).bold()
+            VStack(alignment: .leading, spacing: Spacing.lg) {
+                Text("Reset your password").font(.brandDisplay(20)).foregroundStyle(Color.brandNavy)
                 Text("Enter your email and we'll send you a reset link.")
-                    .font(.footnote).foregroundStyle(.secondary)
+                    .font(.brandBody(13)).foregroundStyle(.secondary)
 
                 if let errorMessage {
-                    Text(errorMessage).font(.footnote).foregroundStyle(.red)
+                    ErrorBanner(message: errorMessage)
                 }
 
                 if didSend {
-                    Text("If an account exists for that email, a reset link is on its way.")
-                        .font(.subheadline)
-                        .padding(10)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.teal.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
+                    HStack(alignment: .top, spacing: Spacing.sm) {
+                        Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.brandTeal)
+                        Text("If an account exists for that email, a reset link is on its way.")
+                            .font(.brandBody(14))
+                    }
+                    .padding(Spacing.md)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.brandTeal.opacity(0.1), in: RoundedRectangle(cornerRadius: Radius.sm))
                 } else {
                     TextField("alex@example.com", text: $email)
                         .textFieldStyle(.roundedBorder)
@@ -42,7 +45,7 @@ struct ForgotPasswordView: View {
                         }
                     }
                     .buttonStyle(.borderedProminent)
-                    .tint(.teal)
+                    .tint(.brandTeal)
                     .controlSize(.large)
                     .disabled(email.isEmpty || isLoading)
                 }
@@ -63,8 +66,10 @@ struct ForgotPasswordView: View {
         errorMessage = nil
         do {
             try await SupabaseService.client.auth.resetPasswordForEmail(email)
+            Haptics.success()
             didSend = true
         } catch {
+            Haptics.error()
             errorMessage = error.localizedDescription
         }
         isLoading = false

@@ -19,21 +19,26 @@ struct DocumentsSection: View {
     private static let bucket = "product-documents"
 
     var body: some View {
-        Section("Documents") {
+        Section {
             if isLoading {
                 ProgressView()
             } else if documents.isEmpty {
-                Text("No documents yet").font(.footnote).foregroundStyle(.secondary)
+                Text("No documents yet").font(.brandBody(13)).foregroundStyle(.secondary)
             } else {
                 ForEach(documents) { doc in
                     Button {
+                        Haptics.light()
                         Task { await view(doc) }
                     } label: {
                         HStack {
-                            Image(systemName: icon(for: doc.documentType)).foregroundStyle(Color.teal)
+                            ZStack {
+                                Circle().fill(Color.brandTeal.opacity(0.12))
+                                Image(systemName: icon(for: doc.documentType)).foregroundStyle(Color.brandTeal).font(.footnote)
+                            }
+                            .frame(width: 30, height: 30)
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(doc.fileName).font(.footnote).foregroundStyle(.primary)
-                                Text(doc.documentType).font(.caption2).foregroundStyle(.secondary)
+                                Text(doc.fileName).font(.brandBody(13, weight: .medium)).foregroundStyle(.primary)
+                                Text(doc.documentType).font(.brandBody(11)).foregroundStyle(.secondary)
                             }
                             Spacer()
                         }
@@ -45,7 +50,7 @@ struct DocumentsSection: View {
             }
 
             if let errorMessage {
-                Text(errorMessage).font(.caption).foregroundStyle(.red)
+                Text(errorMessage).font(.brandBody(11)).foregroundStyle(Color.brandRed)
             }
 
             Button {
@@ -54,10 +59,13 @@ struct DocumentsSection: View {
                 if isUploading {
                     ProgressView()
                 } else {
-                    Label("Add a document", systemImage: "plus")
+                    Label("Add a document", systemImage: "plus.circle")
                 }
             }
+            .foregroundStyle(Color.brandTeal)
             .disabled(isUploading)
+        } header: {
+            Label("Documents", systemImage: "doc.on.doc")
         }
         .task { await load() }
         .fullScreenCover(isPresented: $showingCamera) {
@@ -120,8 +128,10 @@ struct DocumentsSection: View {
                 fileSizeKb: jpeg.count / 1024
             )).execute()
 
+            Haptics.success()
             await load()
         } catch {
+            Haptics.error()
             errorMessage = error.localizedDescription
         }
         isUploading = false

@@ -26,7 +26,7 @@ struct AddProductView: View {
     private var methodPicker: some View {
         List {
             if let extractError {
-                Text(extractError).font(.footnote).foregroundStyle(.red)
+                ErrorBanner(message: extractError)
             }
             Section("How do you want to add it?") {
                 methodRow(icon: "camera.viewfinder", title: "Scan label photo", subtitle: "Point at the product label — Buddy reads it") {
@@ -64,15 +64,18 @@ struct AddProductView: View {
 
     @ViewBuilder
     private func methodRow(icon: String, title: String, subtitle: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+        Button(action: { Haptics.light(); action() }) {
             HStack(spacing: 14) {
-                Image(systemName: icon).font(.title2).foregroundStyle(Color.teal).frame(width: 30)
+                Image(systemName: icon).font(.title2).foregroundStyle(Color.brandTeal).frame(width: 30)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(title).foregroundStyle(.primary)
-                    Text(subtitle).font(.caption).foregroundStyle(.secondary)
+                    Text(title).font(.brandBody(15, weight: .medium)).foregroundStyle(.primary)
+                    Text(subtitle).font(.brandBody(12)).foregroundStyle(.secondary)
                 }
             }
+            .padding(.vertical, 2)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
     }
 
     private func extract(kind: ExtractKind, image: UIImage) async {

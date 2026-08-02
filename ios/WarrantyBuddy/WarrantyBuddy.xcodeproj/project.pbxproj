@@ -8,15 +8,20 @@
 
 /* Begin PBXBuildFile section */
 		0144BFF8D4693009A3702AF2 /* ReceiptReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7931ECC3FA7CA1624B1A9D /* ReceiptReviewView.swift */; };
+		059BDCC7B4B1E294BC7703DE /* Font+Brand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314FC7052EBA806A06325F93 /* Font+Brand.swift */; };
+		068EFAE9ECE59DEF69ACA619 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 628E5E41747A615B46932641 /* Haptics.swift */; };
+		0A16F052C6613CF437EF42D1 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A97B1AA800F1D82270A52FE /* Theme.swift */; };
 		0C4B2F219B08B8367834EFAD /* ProductDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E012C4AAAEA4AA0A3A634737 /* ProductDetailView.swift */; };
 		1B806728E7A9085BF1AA8C00 /* AuthGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E147848982B15917349764A /* AuthGate.swift */; };
 		1B9586C6CCC7CCCCEF14C5FE /* ProductFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD12FE282E2A6278EC5FBD89 /* ProductFormView.swift */; };
 		206BDDE36587A2C08E8BF167 /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E6ACCC33F0FD37447AFF939 /* SafariView.swift */; };
+		264F41C32E1798B829D595DC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3C2FB09E987736F282AF9F13 /* Assets.xcassets */; };
 		26763B813723151AA5A37F68 /* PhotoCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9B60CA8F04F2C786AF5F23 /* PhotoCaptureView.swift */; };
 		301D308B8B1578B3BEBF7122 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3697D6A75E537DAF7C097F41 /* UserProfile.swift */; };
 		38C3B9E3A11934670466CCD1 /* DocumentRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0FCF96D554A6C773CBD4078 /* DocumentRecord.swift */; };
 		41012737F6A03A78CF005BB0 /* AddProductView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C94530A139A88BE6D69B99 /* AddProductView.swift */; };
 		47526BB03DDC4009C6B47DA8 /* RecallAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA291F4B4DE8593A12AAB72 /* RecallAlert.swift */; };
+		5028D6DC8FEBAF1A9AF7F374 /* SpaceGrotesk-Variable.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AE81BDC1DF0868EFF284A45D /* SpaceGrotesk-Variable.ttf */; };
 		5319D08217137A18CD43006D /* CSVExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1FD94CC2B2E31E3117C8E7 /* CSVExport.swift */; };
 		5644D0146CF72F2AB2E5DFA9 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209AF14E50F0E88E32BECA71 /* Config.swift */; };
 		5B02E8769A5D5856CD8D7DC2 /* ProductWithWarranties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207C3C0DC2A2D62BBF96E42E /* ProductWithWarranties.swift */; };
@@ -28,6 +33,7 @@
 		766E92BF3BB280725EBE2026 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6161FEC6A72793078AB87B22 /* LoginView.swift */; };
 		7D8E7708122E70C91991766B /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 6027CB0D6C0D2B5FE966D38D /* Supabase */; };
 		85D47E04F1EAE4C5A75DD411 /* ForgotPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4595A2C5C984922747E6DA /* ForgotPasswordView.swift */; };
+		86987C9CF2D05605EE37B46F /* HankenGrotesk-Variable.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 815FEB79F2FA261198CC4A84 /* HankenGrotesk-Variable.ttf */; };
 		8A9B7B72CA19B6A5AAD3DD09 /* Warranty.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE783B83190C429DE1DA06FF /* Warranty.swift */; };
 		8C731E6566B100D8301CE3AE /* ReceiptQueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CBAEAE5A80255B4C4D0320 /* ReceiptQueueView.swift */; };
 		9678342EF9C9E2D6BBE2BAF5 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B14DA79C412C4E4ECF02E9DF /* SignUpView.swift */; };
@@ -51,19 +57,25 @@
 		209AF14E50F0E88E32BECA71 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		29A9406BB8E9D18F21903881 /* ForwardedReceiptDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardedReceiptDraft.swift; sourceTree = "<group>"; };
 		2B7931ECC3FA7CA1624B1A9D /* ReceiptReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptReviewView.swift; sourceTree = "<group>"; };
+		314FC7052EBA806A06325F93 /* Font+Brand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Brand.swift"; sourceTree = "<group>"; };
 		352650403301A44DDD7CC8F7 /* ClaimReadiness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimReadiness.swift; sourceTree = "<group>"; };
 		3697D6A75E537DAF7C097F41 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		3A1FD94CC2B2E31E3117C8E7 /* CSVExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVExport.swift; sourceTree = "<group>"; };
+		3C2FB09E987736F282AF9F13 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3E6ACCC33F0FD37447AFF939 /* SafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
 		41CBAEAE5A80255B4C4D0320 /* ReceiptQueueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptQueueView.swift; sourceTree = "<group>"; };
 		6161FEC6A72793078AB87B22 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		628E5E41747A615B46932641 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		678E76E3913152C9B25EB946 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
 		6E147848982B15917349764A /* AuthGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthGate.swift; sourceTree = "<group>"; };
+		815FEB79F2FA261198CC4A84 /* HankenGrotesk-Variable.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "HankenGrotesk-Variable.ttf"; sourceTree = "<group>"; };
 		84AA383CF1A34EAEAA7FED63 /* ProductDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDraft.swift; sourceTree = "<group>"; };
 		8B9B60CA8F04F2C786AF5F23 /* PhotoCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCaptureView.swift; sourceTree = "<group>"; };
 		8C041FD1740009BE7B2B95DF /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
-		9BECF05D64C0413A1895826C /* WarrantyBuddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WarrantyBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A97B1AA800F1D82270A52FE /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		9BECF05D64C0413A1895826C /* WarrantyBuddy.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = WarrantyBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0FCF96D554A6C773CBD4078 /* DocumentRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentRecord.swift; sourceTree = "<group>"; };
+		AE81BDC1DF0868EFF284A45D /* SpaceGrotesk-Variable.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-Variable.ttf"; sourceTree = "<group>"; };
 		AF1E9EBB84174254ADAE130A /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		B14DA79C412C4E4ECF02E9DF /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		BC736F70010EA58E75FE5AF9 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
@@ -101,6 +113,15 @@
 				A7EA71B3FC0AF9B2173247A7 /* Vault */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		324089DDBE05C7F1ECA816C2 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				815FEB79F2FA261198CC4A84 /* HankenGrotesk-Variable.ttf */,
+				AE81BDC1DF0868EFF284A45D /* SpaceGrotesk-Variable.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 		3A40B702361A8EFE3D1ADFA7 /* Products */ = {
@@ -143,6 +164,7 @@
 			children = (
 				FBC0786A3C36FC0012A269E9 /* App */,
 				FA60479ABE3C41C0CD133A62 /* Models */,
+				F7A7795BEF6CADCC4DBBA1D4 /* Resources */,
 				AC1E27EB0517026CCD9A57B9 /* Services */,
 				00B678B6B8BB169D73E6536F /* Views */,
 			);
@@ -174,6 +196,7 @@
 			children = (
 				AF1E9EBB84174254ADAE130A /* APIClient.swift */,
 				3A1FD94CC2B2E31E3117C8E7 /* CSVExport.swift */,
+				628E5E41747A615B46932641 /* Haptics.swift */,
 				8C041FD1740009BE7B2B95DF /* SessionStore.swift */,
 				678E76E3913152C9B25EB946 /* SupabaseService.swift */,
 			);
@@ -198,6 +221,15 @@
 			);
 			sourceTree = "<group>";
 		};
+		F7A7795BEF6CADCC4DBBA1D4 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3C2FB09E987736F282AF9F13 /* Assets.xcassets */,
+				324089DDBE05C7F1ECA816C2 /* Fonts */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		FA60479ABE3C41C0CD133A62 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -219,7 +251,9 @@
 			children = (
 				6E147848982B15917349764A /* AuthGate.swift */,
 				209AF14E50F0E88E32BECA71 /* Config.swift */,
+				314FC7052EBA806A06325F93 /* Font+Brand.swift */,
 				BC736F70010EA58E75FE5AF9 /* MainTabView.swift */,
+				9A97B1AA800F1D82270A52FE /* Theme.swift */,
 				EB27B3114AE83D31C1CED90C /* WarrantyBuddyApp.swift */,
 			);
 			path = App;
@@ -233,6 +267,7 @@
 			buildConfigurationList = DDD4FE4F00987B51D539D441 /* Build configuration list for PBXNativeTarget "WarrantyBuddy" */;
 			buildPhases = (
 				84D2B51EB642A039DFBB883E /* Sources */,
+				A02BFEB6BC3D652500BF8058 /* Resources */,
 				29F8821C356692528263CB18 /* Frameworks */,
 			);
 			buildRules = (
@@ -255,6 +290,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = 70C28A15DAE1A77A441DD9C1 /* Build configuration list for PBXProject "WarrantyBuddy" */;
 			developmentRegion = en;
@@ -278,6 +315,19 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		A02BFEB6BC3D652500BF8058 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				264F41C32E1798B829D595DC /* Assets.xcassets in Resources */,
+				86987C9CF2D05605EE37B46F /* HankenGrotesk-Variable.ttf in Resources */,
+				5028D6DC8FEBAF1A9AF7F374 /* SpaceGrotesk-Variable.ttf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		84D2B51EB642A039DFBB883E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -292,8 +342,10 @@
 				5644D0146CF72F2AB2E5DFA9 /* Config.swift in Sources */,
 				38C3B9E3A11934670466CCD1 /* DocumentRecord.swift in Sources */,
 				685AEAA7F15616D68C7C1EDA /* DocumentsSection.swift in Sources */,
+				059BDCC7B4B1E294BC7703DE /* Font+Brand.swift in Sources */,
 				85D47E04F1EAE4C5A75DD411 /* ForgotPasswordView.swift in Sources */,
 				673CF5DCEE055CF6305D1CDB /* ForwardedReceiptDraft.swift in Sources */,
+				068EFAE9ECE59DEF69ACA619 /* Haptics.swift in Sources */,
 				766E92BF3BB280725EBE2026 /* LoginView.swift in Sources */,
 				D5554E0321A6575CC3EF94CD /* MainTabView.swift in Sources */,
 				26763B813723151AA5A37F68 /* PhotoCaptureView.swift in Sources */,
@@ -311,6 +363,7 @@
 				BC89B23ED63D2CF719E1598F /* SettingsListView.swift in Sources */,
 				9678342EF9C9E2D6BBE2BAF5 /* SignUpView.swift in Sources */,
 				B14624D5B72D8BF423565031 /* SupabaseService.swift in Sources */,
+				0A16F052C6613CF437EF42D1 /* Theme.swift in Sources */,
 				301D308B8B1578B3BEBF7122 /* UserProfile.swift in Sources */,
 				D7ECB17777AA0A53DF05957D /* VaultListView.swift in Sources */,
 				8A9B7B72CA19B6A5AAD3DD09 /* Warranty.swift in Sources */,
@@ -383,7 +436,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9K6S7A27L8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = WarrantyBuddy;
@@ -409,7 +461,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9K6S7A27L8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = WarrantyBuddy;

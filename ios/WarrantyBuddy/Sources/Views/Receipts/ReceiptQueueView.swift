@@ -37,15 +37,20 @@ struct ReceiptQueueView: View {
                                 HStack {
                                     ReceiptDraftRow(draft: draft)
                                     Spacer()
-                                    Button("Restore") {
+                                    Button {
                                         Task { await restore(draft) }
+                                    } label: {
+                                        Label("Restore", systemImage: "arrow.uturn.backward")
                                     }
-                                    .font(.caption)
+                                    .font(.brandBody(12))
+                                    .tint(.brandTeal)
                                 }
+                                .opacity(0.7)
                             }
                         }
                     }
                 }
+                .listStyle(.insetGrouped)
                 .navigationDestination(for: ForwardedReceiptDraft.self) { draft in
                     ReceiptReviewView(draft: draft, onConfirmed: { Task { await load() } })
                 }
@@ -105,15 +110,24 @@ private struct ReceiptDraftRow: View {
     let draft: ForwardedReceiptDraft
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(draft.extractedProductName ?? draft.sourceEmailSubject ?? "Forwarded email")
-                .font(.subheadline).bold()
-            HStack(spacing: 4) {
-                if let brand = draft.extractedBrand { Text(brand) }
-                if let retailer = draft.extractedRetailer { Text("· \(retailer)") }
-                if draft.isWarranty { Text("· Warranty").foregroundStyle(Color.teal) }
+        HStack(spacing: Spacing.md) {
+            ZStack {
+                Circle().fill(Color.brandTeal.opacity(0.12))
+                Image(systemName: draft.isWarranty ? "checkmark.shield" : "receipt")
+                    .foregroundStyle(Color.brandTeal)
+                    .font(.footnote)
             }
-            .font(.caption).foregroundStyle(.secondary)
+            .frame(width: 32, height: 32)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(draft.extractedProductName ?? draft.sourceEmailSubject ?? "Forwarded email")
+                    .font(.brandBody(14, weight: .semibold))
+                HStack(spacing: 4) {
+                    if let brand = draft.extractedBrand { Text(brand) }
+                    if let retailer = draft.extractedRetailer { Text("· \(retailer)") }
+                    if draft.isWarranty { Text("· Warranty").foregroundStyle(Color.brandTeal) }
+                }
+                .font(.brandBody(11)).foregroundStyle(.secondary)
+            }
         }
         .padding(.vertical, 2)
     }

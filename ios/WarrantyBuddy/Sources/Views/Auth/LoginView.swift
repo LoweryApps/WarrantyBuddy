@@ -11,32 +11,27 @@ struct LoginView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(spacing: Spacing.xl) {
                     VStack(spacing: 6) {
                         Text("Warranty")
-                            .font(.system(size: 26, weight: .bold, design: .rounded))
-                            .foregroundStyle(.primary)
+                            .font(.brandDisplay(28))
+                            .foregroundStyle(Color.brandNavy)
                         + Text("Buddy")
-                            .font(.system(size: 26, weight: .bold, design: .rounded))
-                            .foregroundStyle(Color.teal)
+                            .font(.brandDisplay(28))
+                            .foregroundStyle(Color.brandTeal)
                         Text("Welcome back")
-                            .font(.subheadline)
+                            .font(.brandBody(14))
                             .foregroundStyle(.secondary)
                     }
                     .padding(.top, 24)
 
                     if let errorMessage {
-                        Text(errorMessage)
-                            .font(.footnote)
-                            .foregroundStyle(.red)
-                            .padding(10)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+                        ErrorBanner(message: errorMessage)
                     }
 
                     VStack(alignment: .leading, spacing: 14) {
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("Email address").font(.caption).foregroundStyle(.secondary)
+                            Text("Email address").font(.brandBody(11)).foregroundStyle(.secondary)
                             TextField("alex@example.com", text: $email)
                                 .textFieldStyle(.roundedBorder)
                                 .keyboardType(.emailAddress)
@@ -44,12 +39,13 @@ struct LoginView: View {
                                 .autocorrectionDisabled()
                         }
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("Password").font(.caption).foregroundStyle(.secondary)
+                            Text("Password").font(.brandBody(11)).foregroundStyle(.secondary)
                             SecureField("••••••••••••", text: $password)
                                 .textFieldStyle(.roundedBorder)
                         }
                         Button("Forgot password?") { showingForgotPassword = true }
-                            .font(.footnote)
+                            .font(.brandBody(12))
+                            .foregroundStyle(Color.brandTeal)
                     }
 
                     Button {
@@ -62,12 +58,13 @@ struct LoginView: View {
                         }
                     }
                     .buttonStyle(.borderedProminent)
-                    .tint(.teal)
+                    .tint(.brandTeal)
                     .controlSize(.large)
                     .disabled(email.isEmpty || password.isEmpty || isLoading)
 
                     Button("Don't have an account? Sign up free") { showingSignUp = true }
-                        .font(.footnote)
+                        .font(.brandBody(12))
+                        .foregroundStyle(Color.brandTeal)
                 }
                 .padding(24)
             }
@@ -82,6 +79,7 @@ struct LoginView: View {
         do {
             try await SupabaseService.client.auth.signIn(email: email, password: password)
         } catch {
+            Haptics.error()
             errorMessage = error.localizedDescription
         }
         isLoading = false

@@ -16,7 +16,7 @@ struct SettingsListView: View {
     @State private var insuranceExportURL: URL?
     @State private var insuranceError: String?
 
-    @State private var showingDeleteConfirm = false
+    @State private var showingDeleteSheet = false
     @State private var deleteConfirmText = ""
     @State private var isDeletingAccount = false
     @State private var deleteError: String?
@@ -29,7 +29,7 @@ struct SettingsListView: View {
                 ContentUnavailableView("Couldn't load settings", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
             } else if var profile {
                 Form {
-                    Section("Profile for claim emails") {
+                    Section {
                         TextField("Full name", text: Binding(
                             get: { profile.fullName ?? "" },
                             set: { profile.fullName = $0; self.profile = profile }
@@ -44,46 +44,61 @@ struct SettingsListView: View {
                         ))
                         .keyboardType(.emailAddress)
                         .textInputAutocapitalization(.never)
+                    } header: {
+                        Label("Profile for claim emails", systemImage: "person.crop.circle")
                     }
 
-                    Section("Notifications") {
+                    Section {
                         Toggle("Email alerts", isOn: Binding(
                             get: { profile.notificationEmail },
                             set: { profile.notificationEmail = $0; self.profile = profile }
                         ))
+                    } header: {
+                        Label("Notifications", systemImage: "bell")
                     }
 
-                    Section("Email forwarding") {
+                    Section {
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("Your forwarding address").font(.caption).foregroundStyle(.secondary)
+                            Text("Your forwarding address").font(.brandBody(11)).foregroundStyle(.secondary)
                             HStack {
-                                Text(profile.forwardingAddress).font(.footnote).lineLimit(1).truncationMode(.middle)
+                                Text(profile.forwardingAddress).font(.brandBody(13)).lineLimit(1).truncationMode(.middle)
                                 Spacer()
-                                Button(copiedForwarding ? "Copied" : "Copy") {
+                                Button {
                                     UIPasteboard.general.string = profile.forwardingAddress
-                                    copiedForwarding = true
+                                    Haptics.light()
+                                    withAnimation { copiedForwarding = true }
+                                } label: {
+                                    Label(copiedForwarding ? "Copied" : "Copy", systemImage: copiedForwarding ? "checkmark" : "doc.on.doc")
                                 }
-                                .font(.caption)
+                                .font(.brandBody(12))
                             }
                         }
+                    } header: {
+                        Label("Email forwarding", systemImage: "envelope.arrow.triangle.branch")
                     }
 
-                    Section("Plan") {
+                    Section {
                         HStack {
                             Text(profile.plan ?? "Free")
                             Spacer()
                             if let status = profile.subscriptionStatus {
-                                Text(status).font(.caption).foregroundStyle(.secondary)
+                                Text(status).font(.brandBody(11)).foregroundStyle(.secondary)
                             }
                         }
+                    } header: {
+                        Label("Plan", systemImage: "star")
                     }
 
                     Section {
-                        Button("Save changes") { Task { await save(profile) } }
-                            .disabled(isSaving)
+                        Button {
+                            Task { await save(profile) }
+                        } label: {
+                            Label("Save changes", systemImage: "checkmark")
+                        }
+                        .disabled(isSaving)
                     }
 
-                    Section("Data & privacy") {
+                    Section {
                         Button {
                             Task { await exportCSV() }
                         } label: {
@@ -106,18 +121,29 @@ struct SettingsListView: View {
                         }
                         .disabled(isGeneratingInsurance)
                         if let insuranceError {
-                            Text(insuranceError).font(.caption).foregroundStyle(.red)
+                            Text(insuranceError).font(.brandBody(11)).foregroundStyle(Color.brandRed)
                         }
 
-                        deleteAccountControl
+                        Button(role: .destructive) {
+                            showingDeleteSheet = true
+                        } label: {
+                            Label("Delete my account", systemImage: "trash")
+                                .foregroundStyle(Color.brandRed)
+                        }
+                    } header: {
+                        Label("Data & privacy", systemImage: "lock.shield")
                     }
 
                     Section {
-                        Button("Sign out", role: .destructive) {
+                        Button(role: .destructive) {
                             Task { try? await SupabaseService.client.auth.signOut() }
+                        } label: {
+                            Label("Sign out", systemImage: "rectangle.portrait.and.arrow.right")
+                                .foregroundStyle(Color.brandRed)
                         }
                     }
                 }
+                .tint(.brandTeal)
             }
         }
         .navigationTitle("Settings")
@@ -128,37 +154,49 @@ struct SettingsListView: View {
         .sheet(item: $insuranceExportURL) { url in
             SafariView(url: url)
         }
+        .sheet(isPresented: $showingDeleteSheet) {
+            deleteAccountSheet
+        }
     }
 
-    @ViewBuilder
-    private var deleteAccountControl: some View {
-        if !showingDeleteConfirm {
-            Button("Delete my account", role: .destructive) {
-                showingDeleteConfirm = true
-            }
-        } else {
-            VStack(alignment: .leading, spacing: 8) {
+    private var deleteAccountSheet: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: Spacing.md) {
                 Text("This will permanently delete all your products, warranties, documents, and receipts. This cannot be undone.")
-                    .font(.caption).foregroundStyle(.red)
+                    .font(.brandBody(13)).foregroundStyle(Color.brandRed)
                 if let deleteError {
-                    Text(deleteError).font(.caption).foregroundStyle(.red)
+                    ErrorBanner(message: deleteError)
                 }
-                Text("Type DELETE to confirm").font(.caption).foregroundStyle(.secondary)
+                Text("Type DELETE to confirm").font(.brandBody(12)).foregroundStyle(.secondary)
                 TextField("DELETE", text: $deleteConfirmText)
                     .textFieldStyle(.roundedBorder)
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.characters)
-                HStack {
+                Button(role: .destructive) {
+                    Task { await deleteAccount() }
+                } label: {
+                    if isDeletingAccount {
+                        ProgressView().frame(maxWidth: .infinity)
+                    } else {
+                        Text("Yes, delete everything").bold().frame(maxWidth: .infinity)
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.brandRed)
+                .controlSize(.large)
+                .disabled(deleteConfirmText != "DELETE" || isDeletingAccount)
+                Spacer()
+            }
+            .padding(Spacing.lg)
+            .navigationTitle("Delete account")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
-                        showingDeleteConfirm = false
+                        showingDeleteSheet = false
                         deleteConfirmText = ""
                         deleteError = nil
                     }
-                    Spacer()
-                    Button(isDeletingAccount ? "Deleting…" : "Yes, delete everything", role: .destructive) {
-                        Task { await deleteAccount() }
-                    }
-                    .disabled(deleteConfirmText != "DELETE" || isDeletingAccount)
                 }
             }
         }
@@ -198,7 +236,9 @@ struct SettingsListView: View {
                 .update(payload)
                 .eq("id", value: userId)
                 .execute()
+            Haptics.success()
         } catch {
+            Haptics.error()
             errorMessage = error.localizedDescription
         }
         isSaving = false
@@ -243,6 +283,7 @@ struct SettingsListView: View {
             try await APIClient.deleteAccount()
             try? await SupabaseService.client.auth.signOut()
         } catch {
+            Haptics.error()
             deleteError = error.localizedDescription
         }
         isDeletingAccount = false

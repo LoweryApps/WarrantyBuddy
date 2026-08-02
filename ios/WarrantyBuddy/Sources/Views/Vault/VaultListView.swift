@@ -2,11 +2,15 @@ import SwiftUI
 
 struct VaultListView: View {
     @EnvironmentObject private var session: SessionStore
+    @Binding var pendingReceiptCount: Int
     @State private var products: [ProductWithWarranties] = []
     @State private var isLoading = true
     @State private var errorMessage: String?
     @State private var showingAdd = false
-    @State private var pendingReceiptCount = 0
+
+    init(pendingReceiptCount: Binding<Int> = .constant(0)) {
+        self._pendingReceiptCount = pendingReceiptCount
+    }
 
     var body: some View {
         Group {
@@ -31,16 +35,21 @@ struct VaultListView: View {
                             ReceiptBanner(count: pendingReceiptCount)
                         }
                         .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
                     }
                     ForEach(products) { item in
                         NavigationLink(value: item) {
                             VaultRow(item: item)
                         }
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets(top: Spacing.xs, leading: Spacing.lg, bottom: Spacing.xs, trailing: Spacing.lg))
                     }
                     .onDelete { offsets in
                         Task { await delete(at: offsets) }
                     }
                 }
+                .listStyle(.plain)
                 .navigationDestination(for: ProductWithWarranties.self) { item in
                     ProductDetailView(item: item, onChanged: { Task { await load() } })
                 }
@@ -68,7 +77,7 @@ struct VaultListView: View {
 
     private func delete(at offsets: IndexSet) async {
         let idsToDelete = offsets.map { products[$0].id }
-        products.remove(atOffsets: offsets)
+        withAnimation { products.remove(atOffsets: offsets) }
         for id in idsToDelete {
             try? await SupabaseService.client.from("products").delete().eq("id", value: id).execute()
         }
@@ -113,20 +122,20 @@ struct ReceiptBanner: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: "text.bubble")
-                .foregroundStyle(Color.teal)
+            Image(systemName: "text.bubble.fill")
+                .foregroundStyle(Color.brandTeal)
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(count) receipt\(count == 1 ? "" : "s") waiting for review")
-                    .font(.caption).bold().foregroundStyle(Color.teal)
+                    .font(.brandBody(13, weight: .semibold)).foregroundStyle(Color.brandTeal)
                 Text("Buddy read your forwarded emails and is ready to confirm")
-                    .font(.caption2).foregroundStyle(Color.teal.opacity(0.8))
+                    .font(.brandBody(11)).foregroundStyle(Color.brandTeal.opacity(0.8))
             }
             Spacer()
-            Image(systemName: "chevron.right").font(.caption).foregroundStyle(Color.teal)
+            Image(systemName: "chevron.right").font(.caption).foregroundStyle(Color.brandTeal)
         }
-        .padding(10)
-        .background(Color.teal.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.teal.opacity(0.4)))
+        .padding(Spacing.md)
+        .background(Color.brandTeal.opacity(0.1), in: RoundedRectangle(cornerRadius: Radius.md))
+        .overlay(RoundedRectangle(cornerRadius: Radius.md).stroke(Color.brandTeal.opacity(0.4)))
     }
 }
 
@@ -134,16 +143,19 @@ private struct VaultRow: View {
     let item: ProductWithWarranties
 
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: iconName)
-                .font(.title3)
-                .foregroundStyle(Color.teal)
-                .frame(width: 32)
+        HStack(spacing: Spacing.md) {
+            ZStack {
+                Circle().fill(Color.brandTeal.opacity(0.12))
+                Image(systemName: iconName)
+                    .font(.title3)
+                    .foregroundStyle(Color.brandTeal)
+            }
+            .frame(width: 44, height: 44)
             VStack(alignment: .leading, spacing: 2) {
-                Text(item.name).font(.subheadline).bold()
+                Text(item.name).font(.brandBody(15, weight: .semibold)).foregroundStyle(.primary)
                 if let brand = item.brand, !brand.isEmpty {
                     Text([brand, item.modelNumber].compactMap { $0 }.joined(separator: " · "))
-                        .font(.caption)
+                        .font(.brandBody(12))
                         .foregroundStyle(.secondary)
                 }
             }
@@ -152,7 +164,7 @@ private struct VaultRow: View {
                 WarrantyPill(warranty: warranty)
             }
         }
-        .padding(.vertical, 4)
+        .cardStyle(padding: Spacing.md)
     }
 
     private var iconName: String {
@@ -171,8 +183,8 @@ private struct WarrantyPill: View {
 
     var body: some View {
         Text(label)
-            .font(.caption2).bold()
-            .padding(.horizontal, 8).padding(.vertical, 3)
+            .font(.brandBody(11, weight: .semibold))
+            .padding(.horizontal, Spacing.sm).padding(.vertical, 3)
             .background(color.opacity(0.15), in: Capsule())
             .foregroundStyle(color)
     }
@@ -189,5 +201,5 @@ private struct WarrantyPill: View {
     }
 
     private var label: String { isExpired ? "Expired" : "Active" }
-    private var color: Color { isExpired ? .red : .teal }
+    private var color: Color { isExpired ? .brandRed : .brandTeal }
 }
