@@ -21,10 +21,10 @@ struct ProductDetailView: View {
             Section {
                 HStack {
                     ZStack {
-                        Circle().fill(Color.brandTeal.opacity(0.12))
+                        Circle().fill(Color.brandInk.opacity(0.1))
                         Image(systemName: categoryIcon)
                             .font(.title2)
-                            .foregroundStyle(Color.brandTeal)
+                            .foregroundStyle(Color.brandInk)
                     }
                     .frame(width: 52, height: 52)
                     VStack(alignment: .leading, spacing: 4) {

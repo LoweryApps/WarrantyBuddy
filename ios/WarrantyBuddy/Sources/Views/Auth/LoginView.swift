@@ -12,7 +12,11 @@ struct LoginView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: Spacing.xl) {
-                    VStack(spacing: 6) {
+                    VStack(spacing: 10) {
+                        Image("Mascot")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 64, height: 64)
                         Text("Warranty")
                             .font(.brandDisplay(28))
                             .foregroundStyle(Color.brandNavy)

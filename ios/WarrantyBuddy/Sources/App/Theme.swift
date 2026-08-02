@@ -24,24 +24,26 @@ enum Radius {
     static let lg: CGFloat = 16
 }
 
-// Reusable card container, matches the web's rounded/shadowed panel treatment.
+// Reusable card container — matches the web's `rounded-xl border bg-white`
+// panel treatment exactly: a flat 1px border, no drop shadow.
 struct CardBackground: ViewModifier {
     var padding: CGFloat = Spacing.lg
+    var borderColor: Color = Color(.separator).opacity(0.5)
 
     func body(content: Content) -> some View {
         content
             .padding(padding)
-            .background(
+            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: Radius.md, style: .continuous))
+            .overlay(
                 RoundedRectangle(cornerRadius: Radius.md, style: .continuous)
-                    .fill(Color(.secondarySystemGroupedBackground))
-                    .shadow(color: .black.opacity(0.06), radius: 6, x: 0, y: 2)
+                    .stroke(borderColor, lineWidth: 1)
             )
     }
 }
 
 extension View {
-    func cardStyle(padding: CGFloat = Spacing.lg) -> some View {
-        modifier(CardBackground(padding: padding))
+    func cardStyle(padding: CGFloat = Spacing.lg, borderColor: Color = Color(.separator).opacity(0.5)) -> some View {
+        modifier(CardBackground(padding: padding, borderColor: borderColor))
     }
 }
 

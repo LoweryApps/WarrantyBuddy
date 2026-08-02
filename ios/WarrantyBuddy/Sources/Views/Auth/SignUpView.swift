@@ -16,6 +16,10 @@ struct SignUpView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.lg) {
+                    Image("Mascot")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 48, height: 48)
                     Text("Create your account").font(.brandDisplay(20)).foregroundStyle(Color.brandNavy)
                     Text("Free to start. No credit card needed.")
                         .font(.brandBody(13)).foregroundStyle(.secondary)

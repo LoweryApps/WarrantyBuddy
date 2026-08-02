@@ -82,24 +82,39 @@ private struct RecallAlertRow: View {
     var onResolve: (() async -> Void)?
 
     @State private var expanded = false
+    @State private var viewingURL: URL?
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             Button {
                 withAnimation { expanded.toggle() }
             } label: {
-                HStack {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(Color.brandRed)
-                    VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: Spacing.md) {
+                    ZStack {
+                        Circle().fill(Color.brandInk.opacity(0.1))
+                        Image(systemName: iconName)
+                            .font(.subheadline)
+                            .foregroundStyle(Color.brandInk)
+                    }
+                    .frame(width: 36, height: 36)
+                    VStack(alignment: .leading, spacing: 4) {
                         Text(alert.products?.name ?? "Unknown product")
                             .font(.brandBody(15, weight: .semibold))
                             .foregroundStyle(.primary)
-                        if let source = alert.recalls?.source {
-                            Text(source).font(.brandBody(10, weight: .bold))
-                                .padding(.horizontal, Spacing.sm).padding(.vertical, 2)
-                                .background(Color.brandRed.opacity(0.12), in: Capsule())
-                                .foregroundStyle(Color.brandRed)
+                        HStack(spacing: Spacing.xs) {
+                            if let source = alert.recalls?.source {
+                                Text(source).font(.brandBody(10, weight: .bold))
+                                    .padding(.horizontal, Spacing.sm).padding(.vertical, 2)
+                                    .background(Color.brandInk.opacity(0.1), in: Capsule())
+                                    .foregroundStyle(Color.brandInk)
+                            }
+                            HStack(spacing: 4) {
+                                Circle().fill(alert.acknowledged ? Color.brandTeal : Color.brandRed).frame(width: 5, height: 5)
+                                Text(alert.acknowledged ? "Resolved" : "Active").font(.brandBody(10, weight: .bold))
+                            }
+                            .padding(.horizontal, Spacing.sm).padding(.vertical, 2)
+                            .background((alert.acknowledged ? Color.brandTeal : Color.brandRed).opacity(0.1), in: Capsule())
+                            .foregroundStyle(alert.acknowledged ? Color.brandTeal : Color.brandRed)
                         }
                     }
                     Spacer()
@@ -119,19 +134,44 @@ private struct RecallAlertRow: View {
                         Text(remedy).font(.brandBody(13))
                     }
                 }
-                if let onResolve {
-                    Button {
-                        Haptics.success()
-                        Task { await onResolve() }
-                    } label: {
-                        Label("Mark resolved", systemImage: "checkmark.circle")
+                HStack(spacing: Spacing.sm) {
+                    if let urlString = alert.recalls?.actionUrl, let url = URL(string: urlString) {
+                        Button {
+                            viewingURL = url
+                        } label: {
+                            Label("\(alert.recalls?.source ?? "Source") page", systemImage: "arrow.up.right.square")
+                        }
+                        .font(.brandBody(13))
+                        .buttonStyle(.bordered)
+                        .tint(.brandInk)
                     }
-                    .font(.brandBody(13))
-                    .buttonStyle(.bordered)
-                    .tint(.brandTeal)
+                    if let onResolve {
+                        Button {
+                            Haptics.success()
+                            Task { await onResolve() }
+                        } label: {
+                            Label("Mark resolved", systemImage: "checkmark.circle")
+                        }
+                        .font(.brandBody(13))
+                        .buttonStyle(.bordered)
+                        .tint(.brandTeal)
+                    }
                 }
             }
         }
-        .cardStyle(padding: Spacing.md)
+        .cardStyle(padding: Spacing.md, borderColor: alert.acknowledged ? Color(.separator).opacity(0.5) : Color.brandRed.opacity(0.4))
+        .sheet(item: $viewingURL) { url in
+            SafariView(url: url)
+        }
+    }
+
+    private var iconName: String {
+        switch alert.products?.category {
+        case "Electronics": return "tv"
+        case "Appliance": return "washer"
+        case "Tool": return "wrench.and.screwdriver"
+        case "Vehicle": return "car"
+        default: return "shippingbox"
+        }
     }
 }

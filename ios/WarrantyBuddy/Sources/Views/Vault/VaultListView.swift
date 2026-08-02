@@ -4,6 +4,7 @@ struct VaultListView: View {
     @EnvironmentObject private var session: SessionStore
     @Binding var pendingReceiptCount: Int
     @State private var products: [ProductWithWarranties] = []
+    @State private var recalledProductIds: Set<String> = []
     @State private var isLoading = true
     @State private var errorMessage: String?
     @State private var showingAdd = false
@@ -39,7 +40,7 @@ struct VaultListView: View {
                     }
                     ForEach(products) { item in
                         NavigationLink(value: item) {
-                            VaultRow(item: item)
+                            VaultRow(item: item, isRecalled: recalledProductIds.contains(item.id))
                         }
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color.clear)
@@ -108,8 +109,21 @@ struct VaultListView: View {
             .count
         pendingReceiptCount = count ?? 0
 
+        let recallRows: [RecalledProductId]? = try? await SupabaseService.client
+            .from("user_recall_alerts")
+            .select("product_id")
+            .eq("acknowledged", value: false)
+            .execute()
+            .value
+        recalledProductIds = Set((recallRows ?? []).map { $0.productId })
+
         isLoading = false
     }
+}
+
+private struct RecalledProductId: Codable {
+    let productId: String
+    enum CodingKeys: String, CodingKey { case productId = "product_id" }
 }
 
 // Hashable placeholder for NavigationLink(value:) — the destination screen
@@ -141,14 +155,15 @@ struct ReceiptBanner: View {
 
 private struct VaultRow: View {
     let item: ProductWithWarranties
+    var isRecalled: Bool = false
 
     var body: some View {
         HStack(spacing: Spacing.md) {
             ZStack {
-                Circle().fill(Color.brandTeal.opacity(0.12))
+                Circle().fill(Color.brandInk.opacity(0.1))
                 Image(systemName: iconName)
                     .font(.title3)
-                    .foregroundStyle(Color.brandTeal)
+                    .foregroundStyle(Color.brandInk)
             }
             .frame(width: 44, height: 44)
             VStack(alignment: .leading, spacing: 2) {
@@ -160,11 +175,9 @@ private struct VaultRow: View {
                 }
             }
             Spacer()
-            if let warranty = item.primaryWarranty {
-                WarrantyPill(warranty: warranty)
-            }
+            WarrantyPill(warranty: item.primaryWarranty)
         }
-        .cardStyle(padding: Spacing.md)
+        .cardStyle(padding: Spacing.md, borderColor: isRecalled ? Color.brandRed.opacity(0.4) : Color(.separator).opacity(0.5))
     }
 
     private var iconName: String {
@@ -178,19 +191,20 @@ private struct VaultRow: View {
     }
 }
 
+// Mirrors the web's status badge: teal "Active", red "Expired", ink "No warranty".
 private struct WarrantyPill: View {
-    let warranty: Warranty
+    let warranty: Warranty?
 
     var body: some View {
         Text(label)
             .font(.brandBody(11, weight: .semibold))
             .padding(.horizontal, Spacing.sm).padding(.vertical, 3)
-            .background(color.opacity(0.15), in: Capsule())
+            .background(color.opacity(warranty == nil ? 0.1 : 0.15), in: Capsule())
             .foregroundStyle(color)
     }
 
     private var isExpired: Bool {
-        guard let endDate = warranty.endDate else { return false }
+        guard let endDate = warranty?.endDate else { return false }
         return endDate < isoToday
     }
 
@@ -200,6 +214,13 @@ private struct WarrantyPill: View {
         return formatter.string(from: Date())
     }
 
-    private var label: String { isExpired ? "Expired" : "Active" }
-    private var color: Color { isExpired ? .brandRed : .brandTeal }
+    private var label: String {
+        guard warranty != nil else { return "No warranty" }
+        return isExpired ? "Expired" : "Active"
+    }
+
+    private var color: Color {
+        guard warranty != nil else { return .brandInk }
+        return isExpired ? .brandRed : .brandTeal
+    }
 }
