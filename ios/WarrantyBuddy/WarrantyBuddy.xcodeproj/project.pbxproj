@@ -25,6 +25,7 @@
 		5319D08217137A18CD43006D /* CSVExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1FD94CC2B2E31E3117C8E7 /* CSVExport.swift */; };
 		5644D0146CF72F2AB2E5DFA9 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209AF14E50F0E88E32BECA71 /* Config.swift */; };
 		5B02E8769A5D5856CD8D7DC2 /* ProductWithWarranties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207C3C0DC2A2D62BBF96E42E /* ProductWithWarranties.swift */; };
+		6345AF9A6D4DF07B0DB69A3D /* BrandHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62C86695DB61BE966D725245 /* BrandHeader.swift */; };
 		66BF4FD99DDC87AF52C28B18 /* ActivityShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A4DB0A1D49A49C9404796F /* ActivityShareSheet.swift */; };
 		673CF5DCEE055CF6305D1CDB /* ForwardedReceiptDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A9406BB8E9D18F21903881 /* ForwardedReceiptDraft.swift */; };
 		67E7B09B565161380CAADADA /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C041FD1740009BE7B2B95DF /* SessionStore.swift */; };
@@ -66,6 +67,7 @@
 		41CBAEAE5A80255B4C4D0320 /* ReceiptQueueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptQueueView.swift; sourceTree = "<group>"; };
 		6161FEC6A72793078AB87B22 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		628E5E41747A615B46932641 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
+		62C86695DB61BE966D725245 /* BrandHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandHeader.swift; sourceTree = "<group>"; };
 		678E76E3913152C9B25EB946 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
 		6E147848982B15917349764A /* AuthGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthGate.swift; sourceTree = "<group>"; };
 		815FEB79F2FA261198CC4A84 /* HankenGrotesk-Variable.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "HankenGrotesk-Variable.ttf"; sourceTree = "<group>"; };
@@ -250,6 +252,7 @@
 			isa = PBXGroup;
 			children = (
 				6E147848982B15917349764A /* AuthGate.swift */,
+				62C86695DB61BE966D725245 /* BrandHeader.swift */,
 				209AF14E50F0E88E32BECA71 /* Config.swift */,
 				314FC7052EBA806A06325F93 /* Font+Brand.swift */,
 				BC736F70010EA58E75FE5AF9 /* MainTabView.swift */,
@@ -337,6 +340,7 @@
 				66BF4FD99DDC87AF52C28B18 /* ActivityShareSheet.swift in Sources */,
 				41012737F6A03A78CF005BB0 /* AddProductView.swift in Sources */,
 				1B806728E7A9085BF1AA8C00 /* AuthGate.swift in Sources */,
+				6345AF9A6D4DF07B0DB69A3D /* BrandHeader.swift in Sources */,
 				5319D08217137A18CD43006D /* CSVExport.swift in Sources */,
 				B04A0739FBDB3B5D13A272EE /* ClaimReadiness.swift in Sources */,
 				5644D0146CF72F2AB2E5DFA9 /* Config.swift in Sources */,

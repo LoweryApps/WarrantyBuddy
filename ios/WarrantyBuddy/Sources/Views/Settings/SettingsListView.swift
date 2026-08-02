@@ -26,6 +26,35 @@ struct SettingsListView: View {
     @State private var portalError: String?
 
     var body: some View {
+        VStack(spacing: 0) {
+            BrandHeader()
+            Text("Settings")
+                .font(.brandDisplay(26))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, Spacing.lg)
+                .padding(.top, Spacing.lg)
+                .padding(.bottom, Spacing.sm)
+
+            settingsContent
+        }
+        .toolbar(.hidden, for: .navigationBar)
+        .task { await load() }
+        .sheet(item: $csvExportURL) { url in
+            ActivityShareSheet(items: [url])
+        }
+        .sheet(item: $insuranceExportURL) { url in
+            SafariView(url: url)
+        }
+        .sheet(isPresented: $showingDeleteSheet) {
+            deleteAccountSheet
+        }
+        .sheet(item: $billingPortalURL) { url in
+            SafariView(url: url)
+        }
+    }
+
+    @ViewBuilder
+    private var settingsContent: some View {
         Group {
             if isLoading {
                 ProgressView()
@@ -169,20 +198,6 @@ struct SettingsListView: View {
                 }
                 .tint(.brandTeal)
             }
-        }
-        .navigationTitle("Settings")
-        .task { await load() }
-        .sheet(item: $csvExportURL) { url in
-            ActivityShareSheet(items: [url])
-        }
-        .sheet(item: $insuranceExportURL) { url in
-            SafariView(url: url)
-        }
-        .sheet(isPresented: $showingDeleteSheet) {
-            deleteAccountSheet
-        }
-        .sheet(item: $billingPortalURL) { url in
-            SafariView(url: url)
         }
     }
 

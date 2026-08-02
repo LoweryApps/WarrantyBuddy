@@ -9,79 +9,92 @@ struct VaultListView: View {
     @State private var errorMessage: String?
     @State private var showingAdd = false
 
+    private let columns = [GridItem(.flexible(), spacing: Spacing.md), GridItem(.flexible(), spacing: Spacing.md)]
+
     init(pendingReceiptCount: Binding<Int> = .constant(0)) {
         self._pendingReceiptCount = pendingReceiptCount
     }
 
     var body: some View {
-        Group {
-            if isLoading {
-                ProgressView()
-            } else if let errorMessage {
-                ContentUnavailableView("Couldn't load your vault", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
-            } else if products.isEmpty {
-                VStack {
-                    if pendingReceiptCount > 0 {
-                        NavigationLink(value: ReceiptBannerDestination()) {
-                            ReceiptBanner(count: pendingReceiptCount)
+        VStack(spacing: 0) {
+            BrandHeader()
+
+            Group {
+                if isLoading {
+                    ProgressView().frame(maxHeight: .infinity)
+                } else if let errorMessage {
+                    ContentUnavailableView("Couldn't load your vault", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
+                        .frame(maxHeight: .infinity)
+                } else {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: Spacing.lg) {
+                            HStack {
+                                Text("Your vault").font(.brandDisplay(26))
+                                Spacer()
+                                Button {
+                                    showingAdd = true
+                                } label: {
+                                    Label("Add product", systemImage: "plus").font(.brandBody(12, weight: .semibold))
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .tint(.brandNavy)
+                                .controlSize(.small)
+                            }
+
+                            if pendingReceiptCount > 0 {
+                                NavigationLink(value: ReceiptBannerDestination()) {
+                                    ReceiptBanner(count: pendingReceiptCount)
+                                }
+                            }
+
+                            if !products.isEmpty {
+                                StatRow(products: products, recallCount: recalledProductIds.count)
+                            }
+
+                            if products.isEmpty {
+                                ContentUnavailableView("No products yet", systemImage: "shield", description: Text("Tap + to add your first product."))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.top, Spacing.xl)
+                            } else {
+                                LazyVGrid(columns: columns, spacing: Spacing.md) {
+                                    ForEach(products) { item in
+                                        NavigationLink(value: item) {
+                                            VaultCard(item: item, isRecalled: recalledProductIds.contains(item.id))
+                                        }
+                                        .buttonStyle(.plain)
+                                        .contextMenu {
+                                            Button(role: .destructive) {
+                                                Task { await delete(item) }
+                                            } label: {
+                                                Label("Delete", systemImage: "trash")
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
-                        .padding()
+                        .padding(Spacing.lg)
                     }
-                    ContentUnavailableView("No products yet", systemImage: "shield", description: Text("Tap + to add your first product."))
-                }
-            } else {
-                List {
-                    if pendingReceiptCount > 0 {
-                        NavigationLink(value: ReceiptBannerDestination()) {
-                            ReceiptBanner(count: pendingReceiptCount)
-                        }
-                        .listRowSeparator(.hidden)
-                        .listRowBackground(Color.clear)
+                    .refreshable { await load() }
+                    .navigationDestination(for: ProductWithWarranties.self) { item in
+                        ProductDetailView(item: item, onChanged: { Task { await load() } })
                     }
-                    ForEach(products) { item in
-                        NavigationLink(value: item) {
-                            VaultRow(item: item, isRecalled: recalledProductIds.contains(item.id))
-                        }
-                        .listRowSeparator(.hidden)
-                        .listRowBackground(Color.clear)
-                        .listRowInsets(EdgeInsets(top: Spacing.xs, leading: Spacing.lg, bottom: Spacing.xs, trailing: Spacing.lg))
-                    }
-                    .onDelete { offsets in
-                        Task { await delete(at: offsets) }
-                    }
-                }
-                .listStyle(.plain)
-                .navigationDestination(for: ProductWithWarranties.self) { item in
-                    ProductDetailView(item: item, onChanged: { Task { await load() } })
                 }
             }
         }
-        .navigationTitle("Your vault")
+        .toolbar(.hidden, for: .navigationBar)
         .navigationDestination(for: ReceiptBannerDestination.self) { _ in
             ReceiptQueueView()
-        }
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    showingAdd = true
-                } label: {
-                    Image(systemName: "plus")
-                }
-            }
         }
         .sheet(isPresented: $showingAdd) {
             AddProductView { Task { await load() } }
         }
         .task { await load() }
-        .refreshable { await load() }
     }
 
-    private func delete(at offsets: IndexSet) async {
-        let idsToDelete = offsets.map { products[$0].id }
-        withAnimation { products.remove(atOffsets: offsets) }
-        for id in idsToDelete {
-            try? await SupabaseService.client.from("products").delete().eq("id", value: id).execute()
-        }
+    private func delete(_ item: ProductWithWarranties) async {
+        withAnimation { products.removeAll { $0.id == item.id } }
+        try? await SupabaseService.client.from("products").delete().eq("id", value: item.id).execute()
     }
 
     private func load() async {
@@ -153,30 +166,165 @@ struct ReceiptBanner: View {
     }
 }
 
-private struct VaultRow: View {
+// Mirrors src/components/dashboard/product-card.tsx's stats grid (Products /
+// Active Warranties / Expiring Soon / Recall Alerts), all computed
+// client-side from data already fetched by VaultListView.load().
+private struct StatRow: View {
+    let products: [ProductWithWarranties]
+    let recallCount: Int
+
+    private var activeWarranties: Int {
+        products.filter { item in
+            guard let status = item.primaryWarranty.map({ WarrantyStatus.compute(endDate: $0.endDate) }) else { return false }
+            return status == .active || status == .expiring
+        }.count
+    }
+
+    private var expiringSoon: Int {
+        products.filter { item in
+            item.primaryWarranty.map({ WarrantyStatus.compute(endDate: $0.endDate) }) == .expiring
+        }.count
+    }
+
+    var body: some View {
+        LazyVGrid(columns: [GridItem(.flexible(), spacing: Spacing.md), GridItem(.flexible(), spacing: Spacing.md)], spacing: Spacing.md) {
+            StatCard(title: "PRODUCTS", value: "\(products.count)", caption: "in your vault", color: .primary)
+            StatCard(title: "ACTIVE WARRANTIES", value: "\(activeWarranties)", caption: "covered", color: .brandTeal)
+            StatCard(title: "EXPIRING SOON", value: "\(expiringSoon)", caption: "within 60 days", color: .brandAmber)
+            StatCard(title: "RECALL ALERTS", value: "\(recallCount)", caption: "needs action", color: .brandRed)
+        }
+    }
+}
+
+private struct StatCard: View {
+    let title: String
+    let value: String
+    let caption: String
+    let color: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title).font(.brandBody(9, weight: .semibold)).foregroundStyle(.secondary)
+            Text(value).font(.brandDisplay(24)).foregroundStyle(color)
+            Text(caption).font(.brandBody(10)).foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardStyle(padding: Spacing.md)
+    }
+}
+
+// Mirrors src/lib/warranty.ts's WarrantyStatus/warrantyStatus/formatDateLabel.
+private enum WarrantyStatus {
+    case active, expiring, expired, noWarranty
+
+    static func compute(endDate: String?) -> WarrantyStatus {
+        guard let endDate, let date = parseDateOnly(endDate) else { return .active }
+        let days = Calendar.current.dateComponents([.day], from: Calendar.current.startOfDay(for: Date()), to: date).day ?? 0
+        if days < 0 { return .expired }
+        if days <= 60 { return .expiring }
+        return .active
+    }
+
+    static func parseDateOnly(_ string: String) -> Date? {
+        let parts = string.prefix(10).split(separator: "-").compactMap { Int($0) }
+        guard parts.count == 3 else { return nil }
+        var components = DateComponents()
+        components.year = parts[0]; components.month = parts[1]; components.day = parts[2]
+        return Calendar.current.date(from: components)
+    }
+
+    static func monthYearLabel(_ dateString: String) -> String {
+        guard let date = parseDateOnly(dateString) else { return dateString }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM yyyy"
+        return formatter.string(from: date)
+    }
+
+    var label: String {
+        switch self {
+        case .active: return "Active"
+        case .expiring: return "Expiring"
+        case .expired: return "Expired"
+        case .noWarranty: return "No warranty"
+        }
+    }
+
+    var icon: String? {
+        switch self {
+        case .active: return "checkmark"
+        case .expiring: return "clock"
+        case .expired: return "xmark"
+        case .noWarranty: return nil
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .active: return .brandTeal
+        case .expiring: return .brandAmber
+        case .expired: return .brandRed
+        case .noWarranty: return .brandInk
+        }
+    }
+}
+
+// Mirrors product-card.tsx exactly: icon+badge row, name, brand/model,
+// divider, then a footer line (expiration label, plus a recall/expiring
+// indicator on the right).
+private struct VaultCard: View {
     let item: ProductWithWarranties
     var isRecalled: Bool = false
 
+    private var status: WarrantyStatus {
+        item.primaryWarranty.map { WarrantyStatus.compute(endDate: $0.endDate) } ?? .noWarranty
+    }
+
+    private var dateLabel: String {
+        guard let warranty = item.primaryWarranty else { return "Added manually" }
+        guard let endDate = warranty.endDate else { return "No expiration on file" }
+        let monthYear = WarrantyStatus.monthYearLabel(endDate)
+        return status == .expired ? "Expired \(monthYear)" : "Expires \(monthYear)"
+    }
+
     var body: some View {
-        HStack(spacing: Spacing.md) {
-            ZStack {
-                Circle().fill(Color.brandInk.opacity(0.1))
-                Image(systemName: iconName)
-                    .font(.title3)
-                    .foregroundStyle(Color.brandInk)
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .top) {
+                ZStack {
+                    Circle().fill(Color.brandInk.opacity(0.1))
+                    Image(systemName: iconName).font(.subheadline).foregroundStyle(Color.brandInk)
+                }
+                .frame(width: 34, height: 34)
+                Spacer()
+                StatusBadge(status: status)
             }
-            .frame(width: 44, height: 44)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(item.name).font(.brandBody(15, weight: .semibold)).foregroundStyle(.primary)
-                if let brand = item.brand, !brand.isEmpty {
-                    Text([brand, item.modelNumber].compactMap { $0 }.joined(separator: " · "))
-                        .font(.brandBody(12))
-                        .foregroundStyle(.secondary)
+            .padding(.bottom, Spacing.sm)
+
+            Text(item.name)
+                .font(.brandBody(12, weight: .medium))
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Text([item.brand, item.modelNumber].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · ").isEmpty ? "—" : [item.brand, item.modelNumber].compactMap { $0 }.joined(separator: " · "))
+                .font(.brandBody(10))
+                .foregroundStyle(Color.brandInk)
+                .lineLimit(1)
+
+            Divider().padding(.vertical, Spacing.sm)
+
+            HStack {
+                Text(dateLabel).font(.brandBody(10)).foregroundStyle(Color.brandInk)
+                Spacer()
+                if isRecalled {
+                    Label("Recall", systemImage: "exclamationmark.triangle.fill")
+                        .font(.brandBody(10, weight: .medium))
+                        .foregroundStyle(Color.brandRed)
+                        .labelStyle(.titleAndIcon)
+                } else if status == .expiring {
+                    Text("Expiring soon").font(.brandBody(10)).foregroundStyle(Color.brandAmber)
                 }
             }
-            Spacer()
-            WarrantyPill(warranty: item.primaryWarranty)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .cardStyle(padding: Spacing.md, borderColor: isRecalled ? Color.brandRed.opacity(0.4) : Color(.separator).opacity(0.5))
     }
 
@@ -191,36 +339,18 @@ private struct VaultRow: View {
     }
 }
 
-// Mirrors the web's status badge: teal "Active", red "Expired", ink "No warranty".
-private struct WarrantyPill: View {
-    let warranty: Warranty?
+private struct StatusBadge: View {
+    let status: WarrantyStatus
 
     var body: some View {
-        Text(label)
-            .font(.brandBody(11, weight: .semibold))
-            .padding(.horizontal, Spacing.sm).padding(.vertical, 3)
-            .background(color.opacity(warranty == nil ? 0.1 : 0.15), in: Capsule())
-            .foregroundStyle(color)
-    }
-
-    private var isExpired: Bool {
-        guard let endDate = warranty?.endDate else { return false }
-        return endDate < isoToday
-    }
-
-    private var isoToday: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: Date())
-    }
-
-    private var label: String {
-        guard warranty != nil else { return "No warranty" }
-        return isExpired ? "Expired" : "Active"
-    }
-
-    private var color: Color {
-        guard warranty != nil else { return .brandInk }
-        return isExpired ? .brandRed : .brandTeal
+        HStack(spacing: 3) {
+            if let icon = status.icon {
+                Image(systemName: icon).font(.system(size: 8, weight: .bold))
+            }
+            Text(status.label).font(.brandBody(10, weight: .semibold))
+        }
+        .padding(.horizontal, Spacing.sm).padding(.vertical, 3)
+        .background(status.color.opacity(status == .noWarranty ? 0.1 : 0.15), in: Capsule())
+        .foregroundStyle(status.color)
     }
 }

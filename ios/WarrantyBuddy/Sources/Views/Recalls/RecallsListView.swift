@@ -13,41 +13,52 @@ struct RecallsListView: View {
     }
 
     var body: some View {
-        Group {
-            if isLoading {
-                ProgressView()
-            } else if let errorMessage {
-                ContentUnavailableView("Couldn't load recalls", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
-            } else if alerts.isEmpty {
-                ContentUnavailableView("No recall matches", systemImage: "checkmark.shield", description: Text("Buddy checks CPSC, NHTSA, FDA, and USDA once a day."))
-            } else {
-                List {
-                    if !active.isEmpty {
-                        Section("Active") {
-                            ForEach(active) { alert in
-                                RecallAlertRow(alert: alert, onResolve: { await resolve(alert) })
-                                    .listRowSeparator(.hidden)
-                                    .listRowBackground(Color.clear)
+        VStack(spacing: 0) {
+            BrandHeader()
+            Text("Recalls")
+                .font(.brandDisplay(26))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, Spacing.lg)
+                .padding(.top, Spacing.lg)
+                .padding(.bottom, Spacing.sm)
+
+            Group {
+                if isLoading {
+                    ProgressView()
+                } else if let errorMessage {
+                    ContentUnavailableView("Couldn't load recalls", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
+                } else if alerts.isEmpty {
+                    ContentUnavailableView("No recall matches", systemImage: "checkmark.shield", description: Text("Buddy checks CPSC, NHTSA, FDA, and USDA once a day."))
+                } else {
+                    List {
+                        if !active.isEmpty {
+                            Section("Active") {
+                                ForEach(active) { alert in
+                                    RecallAlertRow(alert: alert, onResolve: { await resolve(alert) })
+                                        .listRowSeparator(.hidden)
+                                        .listRowBackground(Color.clear)
+                                }
+                            }
+                        }
+                        if !resolved.isEmpty {
+                            Section("Resolved") {
+                                ForEach(resolved) { alert in
+                                    RecallAlertRow(alert: alert, onResolve: nil)
+                                        .listRowSeparator(.hidden)
+                                        .listRowBackground(Color.clear)
+                                        .opacity(0.7)
+                                }
                             }
                         }
                     }
-                    if !resolved.isEmpty {
-                        Section("Resolved") {
-                            ForEach(resolved) { alert in
-                                RecallAlertRow(alert: alert, onResolve: nil)
-                                    .listRowSeparator(.hidden)
-                                    .listRowBackground(Color.clear)
-                                    .opacity(0.7)
-                            }
-                        }
-                    }
+                    .listStyle(.plain)
+                    .refreshable { await load() }
                 }
-                .listStyle(.plain)
             }
+            .frame(maxHeight: .infinity)
         }
-        .navigationTitle("Recalls")
+        .toolbar(.hidden, for: .navigationBar)
         .task { await load() }
-        .refreshable { await load() }
     }
 
     private func load() async {
