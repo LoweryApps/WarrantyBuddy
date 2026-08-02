@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { getStripeClient } from "@/lib/stripe";
-import { createClient } from "@/lib/supabase/server";
+import { getUserFromRequest } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
-export async function POST() {
+export async function POST(request: Request) {
   const stripe = getStripeClient();
   if (!stripe) {
     return NextResponse.json(
@@ -13,14 +13,11 @@ export async function POST() {
     );
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const auth = await getUserFromRequest(request);
+  if (!auth) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const { user, supabase } = auth;
 
   const { data: profile } = await supabase
     .from("users")

@@ -43,6 +43,7 @@ const PUBLIC_PATHS = [
   "/api/insurance-export",
   "/api/account/delete",
   "/api/forwarded-receipts/confirm",
+  "/api/stripe/portal",
 ];
 
 export async function updateSession(request: NextRequest) {
