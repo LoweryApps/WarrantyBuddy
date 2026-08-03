@@ -38,6 +38,24 @@ struct ExtractedReceipt: Decodable {
     }
 }
 
+struct ExtractedWarranty: Decodable {
+    let startDate: String?
+    let endDate: String?
+    let coverageDescription: String?
+    let exclusions: String?
+    let claimContact: String?
+    let uncertain: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case startDate = "start_date"
+        case endDate = "end_date"
+        case coverageDescription = "coverage_description"
+        case exclusions
+        case claimContact = "claim_contact"
+        case uncertain
+    }
+}
+
 enum APIError: LocalizedError {
     case notAuthenticated
     case server(String)
@@ -241,5 +259,62 @@ enum APIClient {
             throw APIError.server(envelope.message ?? envelope.error ?? "Couldn't draft the email (\(status)).")
         }
         return (email, envelope.source ?? "ai")
+    }
+
+    struct WarrantySearchResult: Decodable {
+        let found: Bool
+        let warrantyType: String?
+        let durationMonths: Int?
+        let coverageDescription: String?
+        let exclusions: String?
+        let claimContact: String?
+        let sourceNote: String?
+        let reason: String?
+
+        enum CodingKeys: String, CodingKey {
+            case found
+            case warrantyType = "warranty_type"
+            case durationMonths = "duration_months"
+            case coverageDescription = "coverage_description"
+            case exclusions
+            case claimContact = "claim_contact"
+            case sourceNote = "source_note"
+            case reason
+        }
+    }
+
+    private struct WarrantySearchPayload: Encodable {
+        let productId: String
+    }
+
+    private struct WarrantySearchEnvelope: Decodable {
+        let ok: Bool?
+        let data: WarrantySearchResult?
+        let error: String?
+        let message: String?
+    }
+
+    /// Web-searches for a product's manufacturer warranty terms (Warranty tab's
+    /// "Search for warranty terms" action) — grounds nothing locally, purely a
+    /// web_search-tool-backed model call server-side. Throws with the exact
+    /// server message on failure, including "missing_brand" (product needs a
+    /// brand set first) — a real, actionable error the user needs to see.
+    static func searchWarranty(productId: String) async throws -> WarrantySearchResult {
+        guard let accessToken = try? await SupabaseService.client.auth.session.accessToken else {
+            throw APIError.notAuthenticated
+        }
+        var request = URLRequest(url: baseURL.appendingPathComponent("api/warranty-search"))
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(WarrantySearchPayload(productId: productId))
+
+        let (responseData, response) = try await URLSession.shared.data(for: request)
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        let envelope = try JSONDecoder().decode(WarrantySearchEnvelope.self, from: responseData)
+        guard status == 200, let result = envelope.data else {
+            throw APIError.server(envelope.message ?? envelope.error ?? "Couldn't search for warranty terms (\(status)).")
+        }
+        return result
     }
 }

@@ -25,6 +25,7 @@
 		5319D08217137A18CD43006D /* CSVExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1FD94CC2B2E31E3117C8E7 /* CSVExport.swift */; };
 		5644D0146CF72F2AB2E5DFA9 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209AF14E50F0E88E32BECA71 /* Config.swift */; };
 		5B02E8769A5D5856CD8D7DC2 /* ProductWithWarranties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207C3C0DC2A2D62BBF96E42E /* ProductWithWarranties.swift */; };
+		6200C8701B11A1D9B0883CC7 /* WarrantyEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD629DA3DD14F88C691E2B94 /* WarrantyEditView.swift */; };
 		6345AF9A6D4DF07B0DB69A3D /* BrandHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62C86695DB61BE966D725245 /* BrandHeader.swift */; };
 		66BF4FD99DDC87AF52C28B18 /* ActivityShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A4DB0A1D49A49C9404796F /* ActivityShareSheet.swift */; };
 		673CF5DCEE055CF6305D1CDB /* ForwardedReceiptDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A9406BB8E9D18F21903881 /* ForwardedReceiptDraft.swift */; };
@@ -81,6 +82,7 @@
 		9BECF05D64C0413A1895826C /* WarrantyBuddy.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = WarrantyBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0FCF96D554A6C773CBD4078 /* DocumentRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentRecord.swift; sourceTree = "<group>"; };
 		A93A74348714B50A0F999983 /* WarrantyStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarrantyStatus.swift; sourceTree = "<group>"; };
+		AD629DA3DD14F88C691E2B94 /* WarrantyEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarrantyEditView.swift; sourceTree = "<group>"; };
 		AE81BDC1DF0868EFF284A45D /* SpaceGrotesk-Variable.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-Variable.ttf"; sourceTree = "<group>"; };
 		AF1E9EBB84174254ADAE130A /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		B14DA79C412C4E4ECF02E9DF /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 				E012C4AAAEA4AA0A3A634737 /* ProductDetailView.swift */,
 				3E6ACCC33F0FD37447AFF939 /* SafariView.swift */,
 				17266FDFA1A9DDA735F40BED /* VaultListView.swift */,
+				AD629DA3DD14F88C691E2B94 /* WarrantyEditView.swift */,
 			);
 			path = Vault;
 			sourceTree = "<group>";
@@ -391,6 +394,7 @@
 				D7ECB17777AA0A53DF05957D /* VaultListView.swift in Sources */,
 				8A9B7B72CA19B6A5AAD3DD09 /* Warranty.swift in Sources */,
 				EB047D4404537C60C1C20BDE /* WarrantyBuddyApp.swift in Sources */,
+				6200C8701B11A1D9B0883CC7 /* WarrantyEditView.swift in Sources */,
 				89DD5FC621A1FA23A460C94F /* WarrantyStatus.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

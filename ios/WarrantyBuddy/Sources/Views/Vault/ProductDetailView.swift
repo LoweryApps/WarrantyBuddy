@@ -8,6 +8,7 @@ struct ProductDetailView: View {
     @State private var showingEdit = false
     @State private var showingDeleteConfirm = false
     @State private var showingClaimAssist = false
+    @State private var showingWarrantyEdit = false
 
     private var readiness: ClaimReadinessResult {
         ClaimReadiness.compute(
@@ -59,20 +60,41 @@ struct ProductDetailView: View {
                 Label("Purchase details", systemImage: "cart")
             }
 
-            if let warranty = item.primaryWarranty {
-                Section {
+            Section {
+                if let warranty = item.primaryWarranty {
                     row("Type", warranty.warrantyType)
                     row("Start date", warranty.startDate)
                     row("End date", warranty.endDate)
                     if let coverage = warranty.coverageDescription, !coverage.isEmpty {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Coverage").font(.brandBody(11)).foregroundStyle(.secondary)
+                            Text("What's covered").font(.brandBody(11)).foregroundStyle(.secondary)
                             Text(coverage).font(.brandBody(14))
                         }
                     }
-                } header: {
-                    Label("Warranty", systemImage: "checkmark.shield")
+                    if let exclusions = warranty.exclusions, !exclusions.isEmpty {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("What's not covered").font(.brandBody(11)).foregroundStyle(.secondary)
+                            Text(exclusions).font(.brandBody(14))
+                        }
+                    }
+                    if let claimContact = warranty.claimContact, !claimContact.isEmpty {
+                        row("Claim contact", claimContact)
+                    }
+                    Button {
+                        showingWarrantyEdit = true
+                    } label: {
+                        Label("Edit warranty details", systemImage: "pencil")
+                    }
+                } else {
+                    Text("No warranty on file yet").font(.brandBody(13)).foregroundStyle(.secondary)
+                    Button {
+                        showingWarrantyEdit = true
+                    } label: {
+                        Label("Add warranty", systemImage: "plus")
+                    }
                 }
+            } header: {
+                Label("Warranty", systemImage: "checkmark.shield")
             }
 
             DocumentsSection(productId: item.id)
@@ -84,6 +106,9 @@ struct ProductDetailView: View {
                     Label("File a claim", systemImage: "sparkles")
                 }
                 .foregroundStyle(Color.brandTeal)
+
+                // Ask Buddy slots in here once that feature is built — same
+                // section, same treatment as File a claim.
             }
 
             Section {
@@ -119,6 +144,16 @@ struct ProductDetailView: View {
         }
         .sheet(isPresented: $showingClaimAssist) {
             ClaimAssistView(productId: item.id, productName: item.name)
+        }
+        .sheet(isPresented: $showingWarrantyEdit) {
+            WarrantyEditView(
+                productId: item.id,
+                productBrand: item.brand,
+                purchaseDate: item.purchaseDate,
+                existing: item.primaryWarranty
+            ) {
+                onChanged()
+            }
         }
         .confirmationDialog("Delete this product?", isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
             Button("Delete", role: .destructive) {

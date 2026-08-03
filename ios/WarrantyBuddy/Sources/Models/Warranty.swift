@@ -30,3 +30,29 @@ struct Warranty: Codable, Identifiable, Hashable {
         case expiryNotifiedAt = "expiry_notified_at"
     }
 }
+
+// Matches the columns WarrantyForm.tsx's handleSave writes — used for both
+// inserting a new warranty and updating an existing one.
+struct WarrantyUpsertPayload: Encodable {
+    let productId: String
+    let warrantyType: String
+    let startDate: String?
+    let endDate: String?
+    let coverageDescription: String?
+    let exclusions: String?
+    let claimContact: String?
+    let documentUrl: String?
+    let warrantySource: String
+
+    enum CodingKeys: String, CodingKey {
+        case productId = "product_id"
+        case warrantyType = "warranty_type"
+        case startDate = "start_date"
+        case endDate = "end_date"
+        case coverageDescription = "coverage_description"
+        case exclusions
+        case claimContact = "claim_contact"
+        case documentUrl = "document_url"
+        case warrantySource = "warranty_source"
+    }
+}
