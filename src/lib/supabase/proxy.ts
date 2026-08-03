@@ -45,6 +45,7 @@ const PUBLIC_PATHS = [
   "/api/forwarded-receipts/confirm",
   "/api/stripe/portal",
   "/api/claim-email",
+  "/api/warranty-search",
 ];
 
 export async function updateSession(request: NextRequest) {

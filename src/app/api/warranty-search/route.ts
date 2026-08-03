@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { isPremium } from "@/lib/entitlements";
 import { rateLimitResponse } from "@/lib/rate-limit";
-import { createClient } from "@/lib/supabase/server";
+import { getUserFromRequest } from "@/lib/supabase/server";
 import type { ProductCategory } from "@/lib/supabase/types";
 
 export const runtime = "nodejs";
@@ -66,14 +66,11 @@ function extractJson(text: string): WarrantySearchResult {
 }
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const auth = await getUserFromRequest(request);
+  if (!auth) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const { user, supabase } = auth;
 
   const { data: profile } = await supabase
     .from("users")
