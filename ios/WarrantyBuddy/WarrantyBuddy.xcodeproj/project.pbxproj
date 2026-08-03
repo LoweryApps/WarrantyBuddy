@@ -39,10 +39,12 @@
 		89DD5FC621A1FA23A460C94F /* WarrantyStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = A93A74348714B50A0F999983 /* WarrantyStatus.swift */; };
 		8A9B7B72CA19B6A5AAD3DD09 /* Warranty.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE783B83190C429DE1DA06FF /* Warranty.swift */; };
 		8C731E6566B100D8301CE3AE /* ReceiptQueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CBAEAE5A80255B4C4D0320 /* ReceiptQueueView.swift */; };
+		8EF92A7AEF651E7FB12AF38E /* AskBuddyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB0E8277AF3585577175308 /* AskBuddyView.swift */; };
 		9678342EF9C9E2D6BBE2BAF5 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B14DA79C412C4E4ECF02E9DF /* SignUpView.swift */; };
 		B04A0739FBDB3B5D13A272EE /* ClaimReadiness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352650403301A44DDD7CC8F7 /* ClaimReadiness.swift */; };
 		B14624D5B72D8BF423565031 /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678E76E3913152C9B25EB946 /* SupabaseService.swift */; };
 		BC89B23ED63D2CF719E1598F /* SettingsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110B206DC65E10B301268860 /* SettingsListView.swift */; };
+		BF79E769F9C238EA92CD1C92 /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F5E5AE31A56383AB14D3BFE /* ChatMessage.swift */; };
 		D20ABD82BFBEBC75F56AACAA /* RecallsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D988B688E6B4EB074842EAA /* RecallsListView.swift */; };
 		D5554E0321A6575CC3EF94CD /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC736F70010EA58E75FE5AF9 /* MainTabView.swift */; };
 		D557420C320C571D4061F22C /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1E9EBB84174254ADAE130A /* APIClient.swift */; };
@@ -62,6 +64,7 @@
 		209AF14E50F0E88E32BECA71 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		29A9406BB8E9D18F21903881 /* ForwardedReceiptDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardedReceiptDraft.swift; sourceTree = "<group>"; };
 		2B7931ECC3FA7CA1624B1A9D /* ReceiptReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptReviewView.swift; sourceTree = "<group>"; };
+		2F5E5AE31A56383AB14D3BFE /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
 		314FC7052EBA806A06325F93 /* Font+Brand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Brand.swift"; sourceTree = "<group>"; };
 		352650403301A44DDD7CC8F7 /* ClaimReadiness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimReadiness.swift; sourceTree = "<group>"; };
 		3697D6A75E537DAF7C097F41 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
@@ -97,6 +100,7 @@
 		DBA291F4B4DE8593A12AAB72 /* RecallAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecallAlert.swift; sourceTree = "<group>"; };
 		DC0C76ACC51FF3A0684DF587 /* ClaimContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimContext.swift; sourceTree = "<group>"; };
 		E012C4AAAEA4AA0A3A634737 /* ProductDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailView.swift; sourceTree = "<group>"; };
+		EAB0E8277AF3585577175308 /* AskBuddyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AskBuddyView.swift; sourceTree = "<group>"; };
 		EB27B3114AE83D31C1CED90C /* WarrantyBuddyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarrantyBuddyApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -117,6 +121,7 @@
 			children = (
 				B5606D8DC20D6CE6F4F53E6D /* AddProduct */,
 				9296A0E0387BECE2158A1C93 /* Auth */,
+				A1CE0DC3C99E2E46C3C017F6 /* Chat */,
 				E377575F8B0DA8B811E34B93 /* Claims */,
 				474F2C4CC025CE7584D583F0 /* Recalls */,
 				A767A67C0887782511AF2E8A /* Receipts */,
@@ -180,6 +185,14 @@
 				00B678B6B8BB169D73E6536F /* Views */,
 			);
 			path = Sources;
+			sourceTree = "<group>";
+		};
+		A1CE0DC3C99E2E46C3C017F6 /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				EAB0E8277AF3585577175308 /* AskBuddyView.swift */,
+			);
+			path = Chat;
 			sourceTree = "<group>";
 		};
 		A767A67C0887782511AF2E8A /* Receipts */ = {
@@ -253,6 +266,7 @@
 		FA60479ABE3C41C0CD133A62 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				2F5E5AE31A56383AB14D3BFE /* ChatMessage.swift */,
 				DC0C76ACC51FF3A0684DF587 /* ClaimContext.swift */,
 				352650403301A44DDD7CC8F7 /* ClaimReadiness.swift */,
 				A0FCF96D554A6C773CBD4078 /* DocumentRecord.swift */,
@@ -359,9 +373,11 @@
 				D557420C320C571D4061F22C /* APIClient.swift in Sources */,
 				66BF4FD99DDC87AF52C28B18 /* ActivityShareSheet.swift in Sources */,
 				41012737F6A03A78CF005BB0 /* AddProductView.swift in Sources */,
+				8EF92A7AEF651E7FB12AF38E /* AskBuddyView.swift in Sources */,
 				1B806728E7A9085BF1AA8C00 /* AuthGate.swift in Sources */,
 				6345AF9A6D4DF07B0DB69A3D /* BrandHeader.swift in Sources */,
 				5319D08217137A18CD43006D /* CSVExport.swift in Sources */,
+				BF79E769F9C238EA92CD1C92 /* ChatMessage.swift in Sources */,
 				E218961CF16981203CFA437A /* ClaimAssistView.swift in Sources */,
 				F25F7CB88CF960E62174F9A5 /* ClaimContext.swift in Sources */,
 				B04A0739FBDB3B5D13A272EE /* ClaimReadiness.swift in Sources */,

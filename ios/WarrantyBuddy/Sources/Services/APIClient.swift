@@ -317,4 +317,39 @@ enum APIClient {
         }
         return result
     }
+
+    private struct ChatMessagePayload: Encodable {
+        let productId: String?
+        let message: String
+    }
+
+    private struct ChatMessageEnvelope: Decodable {
+        let userMessage: ChatMessage?
+        let reply: ChatMessage?
+        let error: String?
+        let message: String?
+    }
+
+    /// Sends one Ask Buddy chat turn — the user's message is saved server-side
+    /// regardless of whether the model reply succeeds, but the optimistic
+    /// local bubble already covers that case from the UI's perspective, so on
+    /// failure this just throws with the server's message.
+    static func sendChatMessage(productId: String?, message: String) async throws -> (userMessage: ChatMessage, reply: ChatMessage) {
+        guard let accessToken = try? await SupabaseService.client.auth.session.accessToken else {
+            throw APIError.notAuthenticated
+        }
+        var request = URLRequest(url: baseURL.appendingPathComponent("api/ask-buddy"))
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(ChatMessagePayload(productId: productId, message: message))
+
+        let (responseData, response) = try await URLSession.shared.data(for: request)
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        let envelope = try JSONDecoder().decode(ChatMessageEnvelope.self, from: responseData)
+        guard status == 200, let userMessage = envelope.userMessage, let reply = envelope.reply else {
+            throw APIError.server(envelope.message ?? envelope.error ?? "Buddy couldn't respond (\(status)).")
+        }
+        return (userMessage, reply)
+    }
 }

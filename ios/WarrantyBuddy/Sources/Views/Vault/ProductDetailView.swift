@@ -9,6 +9,7 @@ struct ProductDetailView: View {
     @State private var showingDeleteConfirm = false
     @State private var showingClaimAssist = false
     @State private var showingWarrantyEdit = false
+    @State private var showingAskBuddy = false
 
     private var readiness: ClaimReadinessResult {
         ClaimReadiness.compute(
@@ -107,8 +108,12 @@ struct ProductDetailView: View {
                 }
                 .foregroundStyle(Color.brandTeal)
 
-                // Ask Buddy slots in here once that feature is built — same
-                // section, same treatment as File a claim.
+                Button {
+                    showingAskBuddy = true
+                } label: {
+                    Label("Ask Buddy", systemImage: "bubble.left.and.bubble.right")
+                }
+                .foregroundStyle(Color.brandTeal)
             }
 
             Section {
@@ -154,6 +159,13 @@ struct ProductDetailView: View {
             ) {
                 onChanged()
             }
+        }
+        .sheet(isPresented: $showingAskBuddy) {
+            AskBuddyView(mode: .product(
+                id: item.id,
+                name: item.name,
+                status: item.primaryWarranty.map { WarrantyStatus.compute(endDate: $0.endDate) } ?? .noWarranty
+            ))
         }
         .confirmationDialog("Delete this product?", isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
             Button("Delete", role: .destructive) {

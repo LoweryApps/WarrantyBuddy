@@ -8,6 +8,7 @@ struct VaultListView: View {
     @State private var isLoading = true
     @State private var errorMessage: String?
     @State private var showingAdd = false
+    @State private var showingAskBuddy = false
 
     private let columns = [GridItem(.flexible(), spacing: Spacing.md), GridItem(.flexible(), spacing: Spacing.md)]
 
@@ -16,6 +17,7 @@ struct VaultListView: View {
     }
 
     var body: some View {
+        ZStack(alignment: .bottomTrailing) {
         VStack(spacing: 0) {
             BrandHeader()
 
@@ -82,12 +84,32 @@ struct VaultListView: View {
                 }
             }
         }
+
+        Button {
+            showingAskBuddy = true
+        } label: {
+            HStack(spacing: 6) {
+                Image("Mascot").resizable().scaledToFit().frame(width: 18, height: 18)
+                Text("Ask Buddy").font(.brandBody(12, weight: .semibold))
+            }
+            .padding(.horizontal, Spacing.md)
+            .padding(.vertical, Spacing.sm)
+            .background(Color.brandNavy, in: Capsule())
+            .foregroundStyle(.white)
+            .shadow(color: .black.opacity(0.2), radius: 6, y: 2)
+        }
+        .padding(.trailing, Spacing.lg)
+        .padding(.bottom, Spacing.lg)
+        }
         .toolbar(.hidden, for: .navigationBar)
         .navigationDestination(for: ReceiptBannerDestination.self) { _ in
             ReceiptQueueView()
         }
         .sheet(isPresented: $showingAdd) {
             AddProductView { Task { await load() } }
+        }
+        .sheet(isPresented: $showingAskBuddy) {
+            AskBuddyView(mode: .vault(productCount: products.count))
         }
         .task { await load() }
     }
