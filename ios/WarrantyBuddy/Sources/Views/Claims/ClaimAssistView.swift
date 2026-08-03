@@ -487,8 +487,24 @@ private struct ClaimStep5Email: View {
     @State private var errorMessage: String?
     @State private var copied = false
 
+    // The draft comes back as "Subject: ...\n\n<body>" — split so the
+    // subject can be copied separately from the body, since most email
+    // apps (Mail, Gmail) already have their own Subject field and pasting
+    // "Subject: ..." into the body reads as a mistake.
+    private static func splitSubject(_ email: String) -> (subject: String?, body: String) {
+        guard email.lowercased().hasPrefix("subject:"),
+              let newlineRange = email.range(of: "\n") else {
+            return (nil, email)
+        }
+        let subjectLine = String(email[email.index(email.startIndex, offsetBy: "subject:".count)..<newlineRange.lowerBound])
+            .trimmingCharacters(in: .whitespaces)
+        let rest = email[newlineRange.upperBound...].trimmingCharacters(in: .whitespacesAndNewlines)
+        return (subjectLine.isEmpty ? nil : subjectLine, rest)
+    }
+
     var body: some View {
         if let email {
+            let parsed = Self.splitSubject(email)
             VStack(alignment: .leading, spacing: Spacing.md) {
                 ClaimStepHeader(title: "Here's your claim email", subtitle: "Review it, then copy and paste it into your email app.")
 
@@ -498,7 +514,20 @@ private struct ClaimStep5Email: View {
                     .background(Color.brandTeal.opacity(0.1), in: Capsule())
                     .foregroundStyle(Color.brandTeal)
 
-                Text(email)
+                if let subject = parsed.subject {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text("Subject").font(.brandBody(10)).foregroundStyle(.secondary)
+                            Text(subject).font(.brandBody(12, weight: .medium))
+                        }
+                        Spacer()
+                        CopyButton(value: subject, label: "Copy subject")
+                    }
+                    .padding(Spacing.sm)
+                    .background(Color.brandCloud, in: RoundedRectangle(cornerRadius: Radius.sm))
+                }
+
+                Text(parsed.body)
                     .font(.brandBody(11))
                     .padding(Spacing.md)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -506,7 +535,7 @@ private struct ClaimStep5Email: View {
 
                 HStack(spacing: Spacing.sm) {
                     Button {
-                        UIPasteboard.general.string = email
+                        UIPasteboard.general.string = parsed.body
                         Haptics.light()
                         withAnimation { copied = true }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { withAnimation { copied = false } }
