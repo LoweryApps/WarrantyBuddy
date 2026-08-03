@@ -46,6 +46,7 @@ const PUBLIC_PATHS = [
   "/api/stripe/portal",
   "/api/claim-email",
   "/api/warranty-search",
+  "/api/ask-buddy",
 ];
 
 export async function updateSession(request: NextRequest) {

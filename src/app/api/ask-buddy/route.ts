@@ -13,7 +13,7 @@ import { isPremium } from "@/lib/entitlements";
 import { bestPidMatches, PID_SOURCE_LABEL } from "@/lib/product-intelligence";
 import { rateLimitResponse } from "@/lib/rate-limit";
 import { downloadProductFile } from "@/lib/supabase/storage";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUserFromRequest } from "@/lib/supabase/server";
 import type { ProductCategory } from "@/lib/supabase/types";
 import { warrantyStatus } from "@/lib/warranty";
 
@@ -140,14 +140,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const auth = await getUserFromRequest(request);
+  if (!auth) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const { user, supabase } = auth;
 
   const { data: profile } = await supabase
     .from("users")
