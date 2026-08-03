@@ -44,6 +44,7 @@ const PUBLIC_PATHS = [
   "/api/account/delete",
   "/api/forwarded-receipts/confirm",
   "/api/stripe/portal",
+  "/api/claim-email",
 ];
 
 export async function updateSession(request: NextRequest) {

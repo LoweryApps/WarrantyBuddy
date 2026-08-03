@@ -11,7 +11,7 @@ import { classifyUserReport, upsertProductIntelligence } from "@/lib/product-int
 import { rateLimitResponse } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { downloadProductFile } from "@/lib/supabase/storage";
-import { createClient } from "@/lib/supabase/server";
+import { getUserFromRequest } from "@/lib/supabase/server";
 import type { ProductCategory } from "@/lib/supabase/types";
 
 // Per-user cap on AI claim-email drafts (a lower-frequency action than chat).
@@ -59,14 +59,11 @@ async function recordFailureReport(params: {
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const auth = await getUserFromRequest(request);
+  if (!auth) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const { user, supabase } = auth;
 
   const { data: premiumProfile } = await supabase
     .from("users")
