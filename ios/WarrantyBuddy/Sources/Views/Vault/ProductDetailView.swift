@@ -7,6 +7,7 @@ struct ProductDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showingEdit = false
     @State private var showingDeleteConfirm = false
+    @State private var showingClaimAssist = false
 
     private var readiness: ClaimReadinessResult {
         ClaimReadiness.compute(
@@ -77,6 +78,15 @@ struct ProductDetailView: View {
             DocumentsSection(productId: item.id)
 
             Section {
+                Button {
+                    showingClaimAssist = true
+                } label: {
+                    Label("File a claim", systemImage: "sparkles")
+                }
+                .foregroundStyle(Color.brandTeal)
+            }
+
+            Section {
                 Button(role: .destructive) {
                     Haptics.light()
                     showingDeleteConfirm = true
@@ -106,6 +116,9 @@ struct ProductDetailView: View {
                     dismiss()
                 }
             }
+        }
+        .sheet(isPresented: $showingClaimAssist) {
+            ClaimAssistView(productId: item.id, productName: item.name)
         }
         .confirmationDialog("Delete this product?", isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
             Button("Delete", role: .destructive) {

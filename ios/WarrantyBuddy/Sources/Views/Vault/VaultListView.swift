@@ -213,61 +213,6 @@ private struct StatCard: View {
     }
 }
 
-// Mirrors src/lib/warranty.ts's WarrantyStatus/warrantyStatus/formatDateLabel.
-private enum WarrantyStatus {
-    case active, expiring, expired, noWarranty
-
-    static func compute(endDate: String?) -> WarrantyStatus {
-        guard let endDate, let date = parseDateOnly(endDate) else { return .active }
-        let days = Calendar.current.dateComponents([.day], from: Calendar.current.startOfDay(for: Date()), to: date).day ?? 0
-        if days < 0 { return .expired }
-        if days <= 60 { return .expiring }
-        return .active
-    }
-
-    static func parseDateOnly(_ string: String) -> Date? {
-        let parts = string.prefix(10).split(separator: "-").compactMap { Int($0) }
-        guard parts.count == 3 else { return nil }
-        var components = DateComponents()
-        components.year = parts[0]; components.month = parts[1]; components.day = parts[2]
-        return Calendar.current.date(from: components)
-    }
-
-    static func monthYearLabel(_ dateString: String) -> String {
-        guard let date = parseDateOnly(dateString) else { return dateString }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM yyyy"
-        return formatter.string(from: date)
-    }
-
-    var label: String {
-        switch self {
-        case .active: return "Active"
-        case .expiring: return "Expiring"
-        case .expired: return "Expired"
-        case .noWarranty: return "No warranty"
-        }
-    }
-
-    var icon: String? {
-        switch self {
-        case .active: return "checkmark"
-        case .expiring: return "clock"
-        case .expired: return "xmark"
-        case .noWarranty: return nil
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .active: return .brandTeal
-        case .expiring: return .brandAmber
-        case .expired: return .brandRed
-        case .noWarranty: return .brandInk
-        }
-    }
-}
-
 // Mirrors product-card.tsx exactly: icon+badge row, name, brand/model,
 // divider, then a footer line (expiration label, plus a recall/expiring
 // indicator on the right).

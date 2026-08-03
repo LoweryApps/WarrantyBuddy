@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // Brand palette, mirrors the web app's tailwind.config.ts token values exactly.
 extension Color {
@@ -64,5 +65,30 @@ struct ErrorBanner: View {
         .background(Color.brandRed.opacity(0.08), in: RoundedRectangle(cornerRadius: Radius.sm))
         .listRowBackground(Color.clear)
         .listRowInsets(EdgeInsets())
+    }
+}
+
+// Small reusable "copy to clipboard" button — Claim Assist's Step 3 uses this
+// repeatedly (claim contact, model number, serial number, VIN).
+struct CopyButton: View {
+    let value: String
+    var label: String = "Copy"
+
+    @State private var copied = false
+
+    var body: some View {
+        Button {
+            UIPasteboard.general.string = value
+            Haptics.light()
+            withAnimation { copied = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+                withAnimation { copied = false }
+            }
+        } label: {
+            Image(systemName: copied ? "checkmark" : "doc.on.doc")
+                .font(.caption2)
+        }
+        .foregroundStyle(copied ? Color.brandTeal : Color.brandInk)
+        .accessibilityLabel(label)
     }
 }

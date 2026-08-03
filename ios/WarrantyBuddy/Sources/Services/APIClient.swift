@@ -207,4 +207,39 @@ enum APIClient {
         }
         return productId
     }
+
+    private struct ClaimEmailPayload: Encodable {
+        let productId: String
+        let issue: String
+    }
+
+    private struct ClaimEmailResponse: Decodable {
+        let email: String?
+        let source: String?
+        let error: String?
+        let message: String?
+    }
+
+    /// Drafts an AI warranty-claim email grounded in the product's actual
+    /// warranty document/terms when one is on file (Claim Assist Step 5).
+    /// `source` is "ai" or "template" (deterministic fallback when no
+    /// warranty doc / model call fails) — mirrors the web's response shape.
+    static func draftClaimEmail(productId: String, issue: String) async throws -> (email: String, source: String) {
+        guard let accessToken = try? await SupabaseService.client.auth.session.accessToken else {
+            throw APIError.notAuthenticated
+        }
+        var request = URLRequest(url: baseURL.appendingPathComponent("api/claim-email"))
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(ClaimEmailPayload(productId: productId, issue: issue))
+
+        let (responseData, response) = try await URLSession.shared.data(for: request)
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        let envelope = try JSONDecoder().decode(ClaimEmailResponse.self, from: responseData)
+        guard status == 200, let email = envelope.email else {
+            throw APIError.server(envelope.message ?? envelope.error ?? "Couldn't draft the email (\(status)).")
+        }
+        return (email, envelope.source ?? "ai")
+    }
 }

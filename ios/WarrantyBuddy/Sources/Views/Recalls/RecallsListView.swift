@@ -94,6 +94,7 @@ private struct RecallAlertRow: View {
 
     @State private var expanded = false
     @State private var viewingURL: URL?
+    @State private var showingClaimAssist = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
@@ -158,6 +159,15 @@ private struct RecallAlertRow: View {
                     }
                     if let onResolve {
                         Button {
+                            showingClaimAssist = true
+                        } label: {
+                            Label("File a claim", systemImage: "sparkles")
+                        }
+                        .font(.brandBody(13))
+                        .buttonStyle(.bordered)
+                        .tint(.brandTeal)
+
+                        Button {
                             Haptics.success()
                             Task { await onResolve() }
                         } label: {
@@ -173,6 +183,11 @@ private struct RecallAlertRow: View {
         .cardStyle(padding: Spacing.md, borderColor: alert.acknowledged ? Color(.separator).opacity(0.5) : Color.brandRed.opacity(0.4))
         .sheet(item: $viewingURL) { url in
             SafariView(url: url)
+        }
+        .sheet(isPresented: $showingClaimAssist) {
+            if let productId = alert.products?.id {
+                ClaimAssistView(productId: productId, productName: alert.products?.name ?? "Product")
+            }
         }
     }
 
