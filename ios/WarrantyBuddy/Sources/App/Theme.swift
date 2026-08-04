@@ -68,6 +68,68 @@ struct ErrorBanner: View {
     }
 }
 
+// Direct port of known-issue-banner.tsx — surfaces an aggregated
+// product_intelligence record (NHTSA complaints / user reports) at the same
+// 3 points the web shows it: Warranty tab, Claim Assist, Add Product success.
+struct KnownIssueBanner: View {
+    let record: KnownIssueRecord
+
+    @State private var showingSource = false
+
+    private var tone: Color {
+        switch record.severity {
+        case .safetyHazard: return .brandRed
+        case .major: return .brandAmber
+        case .minor: return .brandInk
+        }
+    }
+
+    private var background: Color {
+        record.severity == .minor ? .brandCloud : tone
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: Spacing.sm) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.caption)
+                    .foregroundStyle(tone)
+                Text("\(record.severity == .safetyHazard ? "Safety issue reported" : "Known issue reported"): \(record.failureType)")
+                    .font(.brandBody(11, weight: .medium))
+                    .foregroundStyle(tone)
+            }
+
+            if let description = record.failureDescription, !description.isEmpty {
+                Text(description)
+                    .font(.brandBody(11))
+                    .foregroundStyle(tone.opacity(0.9))
+            }
+
+            HStack(spacing: 4) {
+                Image(systemName: "doc.text").font(.caption2)
+                Text("\(record.complaintCount) \(record.source.label)")
+                if let sourceURL = record.sourceURL, let url = URL(string: sourceURL) {
+                    Text("·")
+                    Button("Official source") { showingSource = true }
+                        .font(.brandBody(10, weight: .medium))
+                        .underline()
+                        .sheet(isPresented: $showingSource) { SafariView(url: url) }
+                }
+            }
+            .font(.brandBody(10))
+            .foregroundStyle(tone.opacity(0.75))
+
+            Text("This information is based on publicly available complaint data and user reports. WarrantyBuddy does not independently verify these reports.")
+                .font(.brandBody(9))
+                .foregroundStyle(tone.opacity(0.6))
+        }
+        .padding(Spacing.md)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(background.opacity(record.severity == .minor ? 1 : 0.06), in: RoundedRectangle(cornerRadius: Radius.md))
+        .overlay(RoundedRectangle(cornerRadius: Radius.md).stroke(tone.opacity(record.severity == .minor ? 0 : 0.3)))
+    }
+}
+
 // Small reusable "copy to clipboard" button — Claim Assist's Step 3 uses this
 // repeatedly (claim contact, model number, serial number, VIN).
 struct CopyButton: View {

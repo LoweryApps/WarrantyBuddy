@@ -9,18 +9,34 @@ struct AddProductView: View {
     @State private var isExtracting = false
     @State private var extractError: String?
     @State private var draft: ProductDraft?
+    @State private var success: (name: String, knownIssue: KnownIssueRecord?)?
 
     var body: some View {
         NavigationStack {
-            if let draft {
+            if let success {
+                AddProductSuccessView(
+                    name: success.name,
+                    knownIssue: success.knownIssue,
+                    onAddAnother: {
+                        draft = nil
+                        self.success = nil
+                    },
+                    onDone: { dismiss() }
+                )
+            } else if let draft {
                 ProductFormView(mode: .create, initialDraft: draft) {
-                    dismiss()
-                    onSaved()
+                    Task { await handleSaved(draft) }
                 }
             } else {
                 methodPicker
             }
         }
+    }
+
+    private func handleSaved(_ savedDraft: ProductDraft) async {
+        onSaved()
+        let knownIssue = await ProductIntelligenceService.lookup(brand: savedDraft.brand, modelNumber: savedDraft.modelNumber)
+        withAnimation { success = (name: savedDraft.name, knownIssue: knownIssue) }
     }
 
     private var methodPicker: some View {
@@ -114,4 +130,56 @@ struct AddProductView: View {
 
 extension ExtractKind: Identifiable {
     var id: String { rawValue }
+}
+
+// Trimmed-down port of success.tsx — checkmark + known-issue banner + Done.
+// Skips the web's registration link, document-upload dialog, and
+// recall-match banner, which don't have iOS equivalents (recall matching
+// only happens via the existing cron job on iOS, not synchronously at save).
+private struct AddProductSuccessView: View {
+    let name: String
+    let knownIssue: KnownIssueRecord?
+    let onAddAnother: () -> Void
+    let onDone: () -> Void
+
+    var body: some View {
+        VStack(spacing: Spacing.lg) {
+            VStack(spacing: Spacing.sm) {
+                ZStack {
+                    Circle().fill(Color.brandTeal.opacity(0.1))
+                    Image(systemName: "checkmark.circle.fill").font(.title).foregroundStyle(Color.brandTeal)
+                }
+                .frame(width: 56, height: 56)
+                Text("\(name) saved").font(.brandDisplay(17))
+                Text("Added to your vault").font(.brandBody(12)).foregroundStyle(.secondary)
+            }
+            .padding(.top, Spacing.xl)
+
+            if let knownIssue {
+                KnownIssueBanner(record: knownIssue)
+                    .padding(.horizontal, Spacing.lg)
+            }
+
+            Spacer()
+
+            VStack(spacing: Spacing.sm) {
+                Button("Add another product", action: onAddAnother)
+                    .buttonStyle(.bordered)
+                    .frame(maxWidth: .infinity)
+                Button {
+                    onDone()
+                } label: {
+                    Text("Done").bold().frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.brandNavy)
+                .controlSize(.large)
+            }
+            .padding(.horizontal, Spacing.lg)
+            .padding(.bottom, Spacing.lg)
+        }
+        .navigationTitle("Add product")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden()
+    }
 }

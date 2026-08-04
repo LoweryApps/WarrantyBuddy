@@ -17,6 +17,7 @@ struct ClaimAssistView: View {
     @State private var warranty: ClaimWarranty?
     @State private var receipt: ClaimReceipt?
     @State private var recall: ClaimRecall?
+    @State private var knownIssue: KnownIssueRecord?
     @State private var isLoading = true
     @State private var loadError: String?
 
@@ -39,6 +40,11 @@ struct ClaimAssistView: View {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 0) {
                             ClaimProgressBar(step: step, labels: Self.stepLabels)
+
+                            if let knownIssue {
+                                KnownIssueBanner(record: knownIssue)
+                                    .padding(.bottom, Spacing.lg)
+                            }
 
                             switch step {
                             case 1:
@@ -109,6 +115,10 @@ struct ClaimAssistView: View {
                 .execute()
                 .value) ?? []
             recall = alerts.first?.recalls
+
+            if let brand = product?.brand {
+                knownIssue = await ProductIntelligenceService.lookup(brand: brand, modelNumber: product?.modelNumber)
+            }
         } catch {
             loadError = error.localizedDescription
         }

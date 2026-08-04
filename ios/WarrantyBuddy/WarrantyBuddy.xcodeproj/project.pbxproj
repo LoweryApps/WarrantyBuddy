@@ -50,6 +50,7 @@
 		D557420C320C571D4061F22C /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1E9EBB84174254ADAE130A /* APIClient.swift */; };
 		D7ECB17777AA0A53DF05957D /* VaultListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17266FDFA1A9DDA735F40BED /* VaultListView.swift */; };
 		E218961CF16981203CFA437A /* ClaimAssistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DF3B09CF4DDAC72315759D /* ClaimAssistView.swift */; };
+		E344370E4A0010E2251A9E4E /* ProductIntelligence.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB05554DE194998A1C7F3CE6 /* ProductIntelligence.swift */; };
 		E5FB735CD5E8470E6D7DFF53 /* ProductDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84AA383CF1A34EAEAA7FED63 /* ProductDraft.swift */; };
 		EB047D4404537C60C1C20BDE /* WarrantyBuddyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB27B3114AE83D31C1CED90C /* WarrantyBuddyApp.swift */; };
 		F25F7CB88CF960E62174F9A5 /* ClaimContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0C76ACC51FF3A0684DF587 /* ClaimContext.swift */; };
@@ -101,6 +102,7 @@
 		DC0C76ACC51FF3A0684DF587 /* ClaimContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimContext.swift; sourceTree = "<group>"; };
 		E012C4AAAEA4AA0A3A634737 /* ProductDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailView.swift; sourceTree = "<group>"; };
 		EAB0E8277AF3585577175308 /* AskBuddyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AskBuddyView.swift; sourceTree = "<group>"; };
+		EB05554DE194998A1C7F3CE6 /* ProductIntelligence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductIntelligence.swift; sourceTree = "<group>"; };
 		EB27B3114AE83D31C1CED90C /* WarrantyBuddyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarrantyBuddyApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -273,6 +275,7 @@
 				29A9406BB8E9D18F21903881 /* ForwardedReceiptDraft.swift */,
 				C8E985AFF655AED2EEAAD90E /* Product.swift */,
 				84AA383CF1A34EAEAA7FED63 /* ProductDraft.swift */,
+				EB05554DE194998A1C7F3CE6 /* ProductIntelligence.swift */,
 				207C3C0DC2A2D62BBF96E42E /* ProductWithWarranties.swift */,
 				DBA291F4B4DE8593A12AAB72 /* RecallAlert.swift */,
 				3697D6A75E537DAF7C097F41 /* UserProfile.swift */,
@@ -395,6 +398,7 @@
 				0C4B2F219B08B8367834EFAD /* ProductDetailView.swift in Sources */,
 				E5FB735CD5E8470E6D7DFF53 /* ProductDraft.swift in Sources */,
 				1B9586C6CCC7CCCCEF14C5FE /* ProductFormView.swift in Sources */,
+				E344370E4A0010E2251A9E4E /* ProductIntelligence.swift in Sources */,
 				5B02E8769A5D5856CD8D7DC2 /* ProductWithWarranties.swift in Sources */,
 				47526BB03DDC4009C6B47DA8 /* RecallAlert.swift in Sources */,
 				D20ABD82BFBEBC75F56AACAA /* RecallsListView.swift in Sources */,

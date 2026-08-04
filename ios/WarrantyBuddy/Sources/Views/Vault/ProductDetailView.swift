@@ -10,6 +10,11 @@ struct ProductDetailView: View {
     @State private var showingClaimAssist = false
     @State private var showingWarrantyEdit = false
     @State private var showingAskBuddy = false
+    @State private var knownIssue: KnownIssueRecord?
+
+    private var warrantyStatus: WarrantyStatus {
+        item.primaryWarranty.map { WarrantyStatus.compute(endDate: $0.endDate) } ?? .noWarranty
+    }
 
     private var readiness: ClaimReadinessResult {
         ClaimReadiness.compute(
@@ -62,6 +67,9 @@ struct ProductDetailView: View {
             }
 
             Section {
+                if let knownIssue {
+                    KnownIssueBanner(record: knownIssue)
+                }
                 if let warranty = item.primaryWarranty {
                     row("Type", warranty.warrantyType)
                     row("Start date", warranty.startDate)
@@ -127,6 +135,13 @@ struct ProductDetailView: View {
             }
         }
         .tint(.brandTeal)
+        .task(id: warrantyStatus) {
+            guard warrantyStatus == .expiring, let brand = item.brand else {
+                knownIssue = nil
+                return
+            }
+            knownIssue = await ProductIntelligenceService.lookup(brand: brand, modelNumber: item.modelNumber)
+        }
         .navigationTitle(item.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
